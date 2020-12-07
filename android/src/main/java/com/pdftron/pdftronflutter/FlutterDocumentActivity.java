@@ -60,6 +60,8 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         ViewerConfig.Builder builder = new ViewerConfig.Builder().multiTabEnabled(false);
 
         ToolManagerBuilder toolManagerBuilder = ToolManagerBuilder.from();
+        // this is where the document is spawned and I would typically apply configs here @dalnk
+        toolManagerBuilder.setStylusAsPen(true);
         PDFViewCtrlConfig pdfViewCtrlConfig = PDFViewCtrlConfig.getDefaultConfig(packageContext);
         PluginUtils.ConfigInfo configInfo = PluginUtils.handleOpenDocument(builder, toolManagerBuilder, pdfViewCtrlConfig, document, packageContext, configStr);
 
