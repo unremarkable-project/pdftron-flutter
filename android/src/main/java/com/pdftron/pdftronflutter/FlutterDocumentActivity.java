@@ -22,6 +22,7 @@ import com.pdftron.pdf.utils.Utils;
 import com.pdftron.pdftronflutter.helpers.PluginUtils;
 import com.pdftron.pdftronflutter.helpers.ViewerComponent;
 import com.pdftron.pdftronflutter.helpers.ViewerImpl;
+import com.pdftron.pdf.widget.toolbar.component.DefaultToolbars;
 
 import org.json.JSONObject;
 
@@ -57,7 +58,13 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     public static void openDocument(Context packageContext, String document, String password, String configStr) {
 
-        ViewerConfig.Builder builder = new ViewerConfig.Builder().multiTabEnabled(false);
+        ViewerConfig.Builder builder = new ViewerConfig.Builder()
+        .multiTabEnabled(false)
+        .showPageNumberIndicator(false)
+        .initialToolbarTag(DefaultToolbars.TAG_FAVORITE_TOOLBAR)
+        // .toolbarTitle("Notetaking")
+        .documentEditingEnabled(true);
+        // .build();
 
         ToolManagerBuilder toolManagerBuilder = ToolManagerBuilder.from();
         // this is where the document is spawned and I would typically apply configs here @dalnk
@@ -65,13 +72,13 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         PDFViewCtrlConfig pdfViewCtrlConfig = PDFViewCtrlConfig.getDefaultConfig(packageContext);
         PluginUtils.ConfigInfo configInfo = PluginUtils.handleOpenDocument(builder, toolManagerBuilder, pdfViewCtrlConfig, document, packageContext, configStr);
 
-        mShowLeadingNavButton = configInfo.isShowLeadingNavButton();
+        // mShowLeadingNavButton = configInfo.isShowLeadingNavButton();
 
-        if (mShowLeadingNavButton) {
-            openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build());
-        } else {
+        // if (mShowLeadingNavButton) {
+        //     openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build());
+        // } else {
             openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build(), 0);
-        }
+        // }
     }
 
     public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config) {
