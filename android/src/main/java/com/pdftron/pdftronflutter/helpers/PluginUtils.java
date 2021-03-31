@@ -238,6 +238,7 @@ public class PluginUtils {
     public static final String TAG_MEASURE_TOOLBAR = "PDFTron_Measure";
     public static final String TAG_PENS_TOOLBAR = "PDFTron_Pens";
     public static final String TAG_FAVORITE_TOOLBAR = "PDFTron_Favorite";
+    public static final String TAG_REDACTION_TOOLBAR = "PDFTron_Redaction";
 
     // Custom toolbars
     public static final String TOOLBAR_KEY_ID = "id";
