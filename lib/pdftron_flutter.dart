@@ -11,6 +11,7 @@ part 'options.dart';
 part 'document_view.dart';
 part 'events.dart';
 part 'config.dart';
+part 'constants.dart';
 
 class PdftronFlutter {
   static const MethodChannel _channel = const MethodChannel('pdftron_flutter');
@@ -133,5 +134,9 @@ class PdftronFlutter {
   static Future<void> setLeadingNavButtonIcon(String path) {
     return _channel.invokeMethod(Functions.setLeadingNavButtonIcon,
         <String, dynamic>{Parameters.leadingNavButtonIcon: path});
+  }
+
+  static Future<void> closeAllTabs() {
+    return _channel.invokeMethod(Functions.closeAllTabs);
   }
 }

@@ -6,16 +6,33 @@ import androidx.annotation.Nullable;
 import com.pdftron.pdf.Annot;
 import com.pdftron.pdf.PDFDoc;
 import com.pdftron.pdf.PDFViewCtrl;
-import com.pdftron.pdf.controls.PdfViewCtrlTabFragment;
-import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment;
+import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
+import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
 import com.pdftron.pdf.tools.ToolManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodChannel;
 
 public interface ViewerComponent {
+
+    ArrayList<String> getLongPressMenuItems();
+
+    ArrayList<String> getLongPressMenuOverrideItems();
+
+    ArrayList<String> getHideAnnotationMenuTools();
+
+    ArrayList<String> getAnnotationMenuItems();
+
+    ArrayList<String> getAnnotationMenuOverrideItems();
+    
+    boolean isAutoSaveEnabled();
+
+    boolean isUseStylusAsPen();
+
+    boolean isSignSignatureFieldWithStamps();
 
     void setSelectedAnnots(HashMap<Annot, Integer> selectedAnnots);
 
@@ -33,6 +50,10 @@ public interface ViewerComponent {
 
     EventChannel.EventSink getFormFieldValueChangedEventEmitter();
 
+    EventChannel.EventSink getLongPressMenuPressedEventEmitter();
+
+    EventChannel.EventSink getAnnotationMenuPressedEventEmitter();
+
     EventChannel.EventSink getLeadingNavButtonPressedEventEmitter();
 
     EventChannel.EventSink getPageChangedEventEmitter();
@@ -45,10 +66,10 @@ public interface ViewerComponent {
 
     // Convenience
     @Nullable
-    PdfViewCtrlTabHostFragment getPdfViewCtrlTabHostFragment();
+    PdfViewCtrlTabHostFragment2 getPdfViewCtrlTabHostFragment();
 
     @Nullable
-    PdfViewCtrlTabFragment getPdfViewCtrlTabFragment();
+    PdfViewCtrlTabFragment2 getPdfViewCtrlTabFragment();
 
     @Nullable
     PDFViewCtrl getPdfViewCtrl();

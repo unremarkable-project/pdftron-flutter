@@ -1,7 +1,6 @@
 package com.pdftron.pdftronflutter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -14,10 +13,12 @@ import com.pdftron.pdf.PDFDoc;
 import com.pdftron.pdf.PDFViewCtrl;
 import com.pdftron.pdf.config.PDFViewCtrlConfig;
 import com.pdftron.pdf.config.ToolManagerBuilder;
+import com.pdftron.pdf.config.ViewerBuilder;
+import com.pdftron.pdf.config.ViewerBuilder2;
 import com.pdftron.pdf.config.ViewerConfig;
 import com.pdftron.pdf.controls.DocumentActivity;
-import com.pdftron.pdf.controls.PdfViewCtrlTabFragment;
-import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment;
+import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
+import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
 import com.pdftron.pdf.tools.ToolManager;
 import com.pdftron.pdf.utils.Utils;
 import com.pdftron.pdftronflutter.helpers.PluginUtils;
@@ -26,6 +27,7 @@ import com.pdftron.pdftronflutter.helpers.ViewerImpl;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -38,6 +40,14 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     private ViewerImpl mImpl = new ViewerImpl(this);
 
+    private static ArrayList<String> mLongPressMenuItems;
+    private static ArrayList<String> mLongPressMenuOverrideItems;
+    private static ArrayList<String> mHideAnnotationMenuTools;
+    private static ArrayList<String> mAnnotationMenuItems;
+    private static ArrayList<String> mAnnotationMenuOverrideItems;
+    private static boolean mAutoSaveEnabled;
+    private static boolean mUseStylusAsPen;
+    private static boolean mSignSignatureFieldWithStamps;
     private static boolean mShowLeadingNavButton;
 
     private static FlutterDocumentActivity sCurrentActivity;
@@ -50,6 +60,8 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     private static AtomicReference<EventSink> sAnnotationChangedEventEmitter = new AtomicReference<>();
     private static AtomicReference<EventSink> sAnnotationsSelectionEventEmitter = new AtomicReference<>();
     private static AtomicReference<EventSink> sFormFieldChangedEventEmitter = new AtomicReference<>();
+    private static AtomicReference<EventSink> sLongPressMenuPressedEventEmitter = new AtomicReference<>();
+    private static AtomicReference<EventSink> sAnnotationMenuPressedEventEmitter = new AtomicReference<>();
     private static AtomicReference<EventSink> sLeadingNavButtonPressedEventEmitter = new AtomicReference<>();
     private static AtomicReference<EventSink> sPageChangedEventEmitter = new AtomicReference<>();
     private static AtomicReference<EventSink> sZoomChangedEventEmitter = new AtomicReference<>();
@@ -58,11 +70,21 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     public static void openDocument(Context packageContext, String document, String password, String configStr) {
 
-        ViewerConfig.Builder builder = new ViewerConfig.Builder().multiTabEnabled(false);
+        ViewerConfig.Builder builder = new ViewerConfig.Builder().multiTabEnabled(false).showCloseTabOption(false);
 
         ToolManagerBuilder toolManagerBuilder = ToolManagerBuilder.from();
         PDFViewCtrlConfig pdfViewCtrlConfig = PDFViewCtrlConfig.getDefaultConfig(packageContext);
         PluginUtils.ConfigInfo configInfo = PluginUtils.handleOpenDocument(builder, toolManagerBuilder, pdfViewCtrlConfig, document, packageContext, configStr);
+
+        mLongPressMenuItems = configInfo.getLongPressMenuItems();
+        mLongPressMenuOverrideItems = configInfo.getLongPressMenuOverrideItems();
+        mHideAnnotationMenuTools = configInfo.getHideAnnotationMenuTools();
+        mAnnotationMenuItems = configInfo.getAnnotationMenuItems();
+        mAnnotationMenuOverrideItems = configInfo.getAnnotationMenuOverrideItems();
+
+        mAutoSaveEnabled = configInfo.isAutoSaveEnabled();
+        mUseStylusAsPen = configInfo.isUseStylusAsPen();
+        mSignSignatureFieldWithStamps = configInfo.isSignSignatureFieldWithStamps();
 
         mShowLeadingNavButton = configInfo.isShowLeadingNavButton();
 
@@ -73,35 +95,46 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         }
     }
 
-    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config) {
+    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, ViewerConfig config) {
         openDocument(packageContext, fileUri, password, customHeaders, config, DEFAULT_NAV_ICON_ID);
     }
 
-    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config, @DrawableRes int navIconId) {
-        Intent intent = new Intent(packageContext, FlutterDocumentActivity.class);
-        if (null != fileUri) {
-            intent.putExtra("extra_file_uri", fileUri);
+    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, ViewerConfig config, @DrawableRes int navIconId) {
+
+        if (getCurrentActivity() != null && getCurrentActivity().getPdfViewCtrlTabHostFragment() != null) {
+
+            ViewerBuilder2 viewerBuilder = ViewerBuilder2.withUri(fileUri, password)
+                    .usingCustomHeaders(customHeaders)
+                    .usingConfig(config)
+                    .usingNavIcon(navIconId);
+
+            getCurrentActivity().getPdfViewCtrlTabHostFragment().onOpenAddNewTab(viewerBuilder.createBundle(packageContext));
+        } else {
+            DocumentActivity.IntentBuilder intentBuilder = DocumentActivity.IntentBuilder.fromActivityClass(packageContext, FlutterDocumentActivity.class);
+
+            if (null != fileUri) {
+                intentBuilder.withUri(fileUri);
+            }
+
+            if (null != password) {
+                intentBuilder.usingPassword(password);
+            }
+
+            if (null != customHeaders) {
+                intentBuilder.usingCustomHeaders(customHeaders);
+            }
+
+            intentBuilder.usingNavIcon(navIconId);
+            intentBuilder.usingConfig(config);
+            intentBuilder.usingNewUi(true);
+            packageContext.startActivity(intentBuilder.build());
         }
-
-        if (null != password) {
-            intent.putExtra("extra_file_password", password);
-        }
-
-        if (null != customHeaders) {
-            intent.putExtra("extra_custom_headers", customHeaders.toString());
-        }
-
-        intent.putExtra("extra_nav_icon", navIconId);
-        intent.putExtra("extra_config", config);
-        intent.putExtra(EXTRA_NEW_UI, false);
-
-        packageContext.startActivity(intent);
     }
 
     public static void setLeadingNavButtonIcon(String leadingNavButtonIcon) {
         FlutterDocumentActivity documentActivity = getCurrentActivity();
         if (documentActivity != null) {
-            PdfViewCtrlTabHostFragment pdfViewCtrlTabHostFragment = documentActivity.getPdfViewCtrlTabHostFragment();
+            PdfViewCtrlTabHostFragment2 pdfViewCtrlTabHostFragment = documentActivity.getPdfViewCtrlTabHostFragment();
             if (mShowLeadingNavButton && pdfViewCtrlTabHostFragment != null
                     && pdfViewCtrlTabHostFragment.getToolbar() != null) {
                 int res = Utils.getResourceDrawable(pdfViewCtrlTabHostFragment.getToolbar().getContext(), leadingNavButtonIcon);
@@ -138,6 +171,14 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     public static void setFormFieldValueChangedEventEmitter(EventSink emitter) {
         sFormFieldChangedEventEmitter.set(emitter);
+    }
+
+    public static void setLongPressMenuPressedEventEmitter(EventSink emitter) {
+        sLongPressMenuPressedEventEmitter.set(emitter);
+    }
+
+    public static void setAnnotationMenuPressedEventEmitter(EventSink emitter) {
+        sAnnotationMenuPressedEventEmitter.set(emitter);
     }
 
     public static void setLeadingNavButtonPressedEventEmitter(EventSink emitter) {
@@ -195,6 +236,15 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     }
 
     @Override
+    public EventSink getLongPressMenuPressedEventEmitter() {
+        return sLongPressMenuPressedEventEmitter.get();
+    }
+
+    @Override
+    public EventSink getAnnotationMenuPressedEventEmitter() {
+        return sAnnotationMenuPressedEventEmitter.get();
+    }
+
     public EventSink getLeadingNavButtonPressedEventEmitter() {
         return sLeadingNavButtonPressedEventEmitter.get();
     }
@@ -220,6 +270,31 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     }
 
     @Override
+    public ArrayList<String> getLongPressMenuItems() {
+        return mLongPressMenuItems;
+    }
+
+    @Override
+    public ArrayList<String> getLongPressMenuOverrideItems() {
+        return mLongPressMenuOverrideItems;
+    }
+
+    @Override
+    public ArrayList<String> getHideAnnotationMenuTools() {
+        return mHideAnnotationMenuTools;
+    }
+
+    @Override
+    public ArrayList<String> getAnnotationMenuItems() {
+        return mAnnotationMenuItems;
+    }
+
+    @Override
+    public ArrayList<String> getAnnotationMenuOverrideItems() {
+        return mAnnotationMenuOverrideItems;
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -239,6 +314,8 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         sAnnotationChangedEventEmitter.set(null);
         sAnnotationsSelectionEventEmitter.set(null);
         sFormFieldChangedEventEmitter.set(null);
+        sLongPressMenuPressedEventEmitter.set(null);
+        sAnnotationMenuPressedEventEmitter.set(null);
         sLeadingNavButtonPressedEventEmitter.set(null);
         sPageChangedEventEmitter.set(null);
         sZoomChangedEventEmitter.set(null);
@@ -260,9 +337,23 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         return PluginUtils.handleOpenDocError(this);
     }
 
+    public boolean isAutoSaveEnabled() {
+        return mAutoSaveEnabled;
+    }
+
+    public boolean isUseStylusAsPen() {
+        return mUseStylusAsPen;
+    }
+
+    public boolean isSignSignatureFieldWithStamps() {
+        return mSignSignatureFieldWithStamps;
+    }
+
     @Override
     public void onNavButtonPressed() {
         handleLeadingNavButtonPressed(this);
+
+        super.onNavButtonPressed();
     }
 
     private void attachActivity() {
@@ -280,14 +371,14 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     // Convenience
 
     @Nullable
-    public PdfViewCtrlTabHostFragment getPdfViewCtrlTabHostFragment() {
-        return mPdfViewCtrlTabHostFragment;
+    public PdfViewCtrlTabHostFragment2 getPdfViewCtrlTabHostFragment() {
+        return mPdfViewCtrlTabHostFragment2;
     }
 
     @Nullable
-    public PdfViewCtrlTabFragment getPdfViewCtrlTabFragment() {
-        if (mPdfViewCtrlTabHostFragment != null) {
-            return mPdfViewCtrlTabHostFragment.getCurrentPdfViewCtrlFragment();
+    public PdfViewCtrlTabFragment2 getPdfViewCtrlTabFragment() {
+        if (mPdfViewCtrlTabHostFragment2 != null) {
+            return mPdfViewCtrlTabHostFragment2.getCurrentPdfViewCtrlFragment();
         }
         return null;
     }
