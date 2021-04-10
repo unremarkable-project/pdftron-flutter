@@ -1,243 +1,216 @@
-package com.pdftron.pdftronflutter;
+package com.pdftron.pdftronflutter
 
-import android.content.Context;
-import android.view.View;
+import android.content.Context
+import android.view.View
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import com.pdftron.pdftronflutter.helpers.PluginUtils
+import com.pdftron.pdftronflutter.views.DocumentView
+import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.platform.PlatformView
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATIONS_SELECTED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATION_CHANGED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATION_MENU_PRESSED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_DOCUMENT_ERROR
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_DOCUMENT_LOADED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_EXPORT_ANNOTATION_COMMAND
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_EXPORT_BOOKMARK
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_FORM_FIELD_VALUE_CHANGED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_LEADING_NAV_BUTTON_PRESSED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_LONG_PRESS_MENU_PRESSED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_PAGE_CHANGED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ZOOM_CHANGED
+import com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT
+import com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_SET_LEADING_NAV_BUTTON_ICON
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LEADING_NAV_BUTTON_ICON
 
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-
-import com.pdftron.pdftronflutter.helpers.PluginUtils;
-import com.pdftron.pdftronflutter.views.DocumentView;
-
-import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.platform.PlatformView;
-
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATIONS_SELECTED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATION_CHANGED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ANNOTATION_MENU_PRESSED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_DOCUMENT_ERROR;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_DOCUMENT_LOADED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_EXPORT_ANNOTATION_COMMAND;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_EXPORT_BOOKMARK;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_FORM_FIELD_VALUE_CHANGED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_LEADING_NAV_BUTTON_PRESSED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_LONG_PRESS_MENU_PRESSED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_PAGE_CHANGED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.EVENT_ZOOM_CHANGED;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_OPEN_DOCUMENT;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.FUNCTION_SET_LEADING_NAV_BUTTON_ICON;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LEADING_NAV_BUTTON_ICON;
-
-public class FlutterDocumentView implements PlatformView, MethodChannel.MethodCallHandler {
-
-    private final DocumentView documentView;
-
-    private final MethodChannel methodChannel;
-
-    public FlutterDocumentView(Context context, Context activityContext, BinaryMessenger messenger, int id) {
-
-        registerWith(messenger);
-        documentView = new DocumentView(context);
-
-        FragmentManager manager = null;
-        if (activityContext instanceof FragmentActivity) {
-            manager = ((FragmentActivity) activityContext).getSupportFragmentManager();
-        }
-
-        documentView.setSupportFragmentManager(manager);
-
-        methodChannel = new MethodChannel(messenger, "pdftron_flutter/documentview_" + id);
-        methodChannel.setMethodCallHandler(this);
-    }
-
-    public void registerWith(BinaryMessenger messenger) {
-
-        final EventChannel annotEventChannel = new EventChannel(messenger, EVENT_EXPORT_ANNOTATION_COMMAND);
-        annotEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+class FlutterDocumentView(context: Context?, activityContext: Context, messenger: BinaryMessenger?, id: Int) : PlatformView, MethodChannel.MethodCallHandler {
+    private val documentView: DocumentView
+    private val methodChannel: MethodChannel
+    fun registerWith(messenger: BinaryMessenger?) {
+        val annotEventChannel = EventChannel(messenger, EVENT_EXPORT_ANNOTATION_COMMAND)
+        annotEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setExportAnnotationCommandEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setExportAnnotationCommandEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setExportAnnotationCommandEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setExportAnnotationCommandEventEmitter(null)
             }
-        });
-
-        final EventChannel bookmarkEventChannel = new EventChannel(messenger, EVENT_EXPORT_BOOKMARK);
-        bookmarkEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val bookmarkEventChannel = EventChannel(messenger, EVENT_EXPORT_BOOKMARK)
+        bookmarkEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setExportBookmarkEventEmitter(emitter);
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                documentView.setExportBookmarkEventEmitter(null);
-            }
-        });
-
-        final EventChannel documentLoadedEventChannel = new EventChannel(messenger, EVENT_DOCUMENT_LOADED);
-        documentLoadedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setDocumentLoadedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setExportBookmarkEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setDocumentLoadedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setExportBookmarkEventEmitter(null)
             }
-        });
-
-        final EventChannel documentErrorEventChannel = new EventChannel(messenger, EVENT_DOCUMENT_ERROR);
-        documentErrorEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val documentLoadedEventChannel = EventChannel(messenger, EVENT_DOCUMENT_LOADED)
+        documentLoadedEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setDocumentErrorEventEmitter(emitter);
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                documentView.setDocumentErrorEventEmitter(null);
-            }
-        });
-
-        final EventChannel annotationChangedEventChannel = new EventChannel(messenger, EVENT_ANNOTATION_CHANGED);
-        annotationChangedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setAnnotationChangedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setDocumentLoadedEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setAnnotationChangedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setDocumentLoadedEventEmitter(null)
             }
-        });
-
-        final EventChannel annotationSelectedEventChannel = new EventChannel(messenger, EVENT_ANNOTATIONS_SELECTED);
-        annotationSelectedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val documentErrorEventChannel = EventChannel(messenger, EVENT_DOCUMENT_ERROR)
+        documentErrorEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setAnnotationsSelectedEventEmitter(emitter);
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                documentView.setAnnotationsSelectedEventEmitter(null);
-            }
-        });
-
-        final EventChannel formFieldValueChangedEventChannel = new EventChannel(messenger, EVENT_FORM_FIELD_VALUE_CHANGED);
-        formFieldValueChangedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setFormFieldValueChangedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setDocumentErrorEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setFormFieldValueChangedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setDocumentErrorEventEmitter(null)
             }
-        });
-
-        final EventChannel longPressMenuPressedEventChannel = new EventChannel(messenger, EVENT_LONG_PRESS_MENU_PRESSED);
-        longPressMenuPressedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val annotationChangedEventChannel = EventChannel(messenger, EVENT_ANNOTATION_CHANGED)
+        annotationChangedEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setLongPressMenuPressedEventEmitter(emitter);
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                documentView.setLongPressMenuPressedEventEmitter(null);
-            }
-        });
-
-        final EventChannel annotationMenuPressedEventChannel = new EventChannel(messenger, EVENT_ANNOTATION_MENU_PRESSED);
-        annotationMenuPressedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setAnnotationMenuPressedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setAnnotationChangedEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setAnnotationMenuPressedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setAnnotationChangedEventEmitter(null)
             }
-        });
-
-        final EventChannel leadingNavButtonPressedEventChannel = new EventChannel(messenger, EVENT_LEADING_NAV_BUTTON_PRESSED);
-        leadingNavButtonPressedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val annotationSelectedEventChannel = EventChannel(messenger, EVENT_ANNOTATIONS_SELECTED)
+        annotationSelectedEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setLeadingNavButtonPressedEventEmitter(emitter);
-            }
-
-            @Override
-            public void onCancel(Object arguments) {
-                documentView.setLeadingNavButtonIcon(null);
-            }
-        });
-
-        final EventChannel pageChangedEventChannel = new EventChannel(messenger, EVENT_PAGE_CHANGED);
-        pageChangedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
-            @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setPageChangedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setAnnotationsSelectedEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setPageChangedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setAnnotationsSelectedEventEmitter(null)
             }
-        });
-
-        final EventChannel zoomChangedEventChannel = new EventChannel(messenger, EVENT_ZOOM_CHANGED);
-        zoomChangedEventChannel.setStreamHandler(new EventChannel.StreamHandler() {
+        })
+        val formFieldValueChangedEventChannel = EventChannel(messenger, EVENT_FORM_FIELD_VALUE_CHANGED)
+        formFieldValueChangedEventChannel.setStreamHandler(object : StreamHandler() {
             @Override
-            public void onListen(Object arguments, EventChannel.EventSink emitter) {
-                documentView.setZoomChangedEventEmitter(emitter);
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setFormFieldValueChangedEventEmitter(emitter)
             }
 
             @Override
-            public void onCancel(Object arguments) {
-                documentView.setZoomChangedEventEmitter(null);
+            fun onCancel(arguments: Object?) {
+                documentView.setFormFieldValueChangedEventEmitter(null)
             }
-        });
+        })
+        val longPressMenuPressedEventChannel = EventChannel(messenger, EVENT_LONG_PRESS_MENU_PRESSED)
+        longPressMenuPressedEventChannel.setStreamHandler(object : StreamHandler() {
+            @Override
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setLongPressMenuPressedEventEmitter(emitter)
+            }
+
+            @Override
+            fun onCancel(arguments: Object?) {
+                documentView.setLongPressMenuPressedEventEmitter(null)
+            }
+        })
+        val annotationMenuPressedEventChannel = EventChannel(messenger, EVENT_ANNOTATION_MENU_PRESSED)
+        annotationMenuPressedEventChannel.setStreamHandler(object : StreamHandler() {
+            @Override
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setAnnotationMenuPressedEventEmitter(emitter)
+            }
+
+            @Override
+            fun onCancel(arguments: Object?) {
+                documentView.setAnnotationMenuPressedEventEmitter(null)
+            }
+        })
+        val leadingNavButtonPressedEventChannel = EventChannel(messenger, EVENT_LEADING_NAV_BUTTON_PRESSED)
+        leadingNavButtonPressedEventChannel.setStreamHandler(object : StreamHandler() {
+            @Override
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setLeadingNavButtonPressedEventEmitter(emitter)
+            }
+
+            @Override
+            fun onCancel(arguments: Object?) {
+                documentView.setLeadingNavButtonIcon(null)
+            }
+        })
+        val pageChangedEventChannel = EventChannel(messenger, EVENT_PAGE_CHANGED)
+        pageChangedEventChannel.setStreamHandler(object : StreamHandler() {
+            @Override
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setPageChangedEventEmitter(emitter)
+            }
+
+            @Override
+            fun onCancel(arguments: Object?) {
+                documentView.setPageChangedEventEmitter(null)
+            }
+        })
+        val zoomChangedEventChannel = EventChannel(messenger, EVENT_ZOOM_CHANGED)
+        zoomChangedEventChannel.setStreamHandler(object : StreamHandler() {
+            @Override
+            fun onListen(arguments: Object?, emitter: EventChannel.EventSink?) {
+                documentView.setZoomChangedEventEmitter(emitter)
+            }
+
+            @Override
+            fun onCancel(arguments: Object?) {
+                documentView.setZoomChangedEventEmitter(null)
+            }
+        })
     }
 
     @Override
-    public void onMethodCall(MethodCall call, MethodChannel.Result result) {
-        switch (call.method) {
-            case FUNCTION_OPEN_DOCUMENT:
-                String document = call.argument("document");
-                String password = call.argument("password");
-                String config = call.argument("config");
-                documentView.openDocument(document, password, config, result);
-                break;
-            case FUNCTION_SET_LEADING_NAV_BUTTON_ICON: {
-                String leadingNavButtonIcon = call.argument(KEY_LEADING_NAV_BUTTON_ICON);
-                documentView.setLeadingNavButtonIcon(leadingNavButtonIcon);
-                break;
+    fun onMethodCall(call: MethodCall, result: MethodChannel.Result?) {
+        when (call.method) {
+            FUNCTION_OPEN_DOCUMENT -> {
+                val document: String = call.argument("document")
+                val password: String = call.argument("password")
+                val config: String = call.argument("config")
+                documentView.openDocument(document, password, config, result)
             }
-            default:
-                PluginUtils.onMethodCall(call, result, documentView);
-                break;
+            FUNCTION_SET_LEADING_NAV_BUTTON_ICON -> {
+                val leadingNavButtonIcon: String = call.argument(KEY_LEADING_NAV_BUTTON_ICON)
+                documentView.setLeadingNavButtonIcon(leadingNavButtonIcon)
+            }
+            else -> PluginUtils.onMethodCall(call, result, documentView)
         }
     }
 
-    @Override
-    public View getView() {
-        return documentView;
-    }
+    @get:Override
+    val view: View
+        get() = documentView
 
     @Override
-    public void dispose() {
+    fun dispose() {
+    }
+
+    init {
+        registerWith(messenger)
+        documentView = DocumentView(context)
+        var manager: FragmentManager? = null
+        if (activityContext is FragmentActivity) {
+            manager = (activityContext as FragmentActivity).getSupportFragmentManager()
+        }
+        documentView.setSupportFragmentManager(manager)
+        methodChannel = MethodChannel(messenger, "pdftron_flutter/documentview_$id")
+        methodChannel.setMethodCallHandler(this)
     }
 }

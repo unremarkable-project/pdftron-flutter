@@ -1,290 +1,246 @@
-package com.pdftron.pdftronflutter.helpers;
+package com.pdftron.pdftronflutter.helpers
 
-import android.os.Bundle;
-import android.view.View;
+import android.os.Bundle
+import android.view.View
+import com.pdftron.pdf.Annot
+import com.pdftron.pdf.Field
+import com.pdftron.pdf.PDFViewCtrl
+import com.pdftron.pdf.annots.Widget
+import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2
+import com.pdftron.pdf.tools.QuickMenu
+import com.pdftron.pdf.tools.QuickMenuItem
+import com.pdftron.pdf.tools.ToolManager
+import com.pdftron.pdf.utils.AnnotUtils
+import com.pdftron.pdf.utils.ViewerUtils
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.List
+import java.util.Map
+import io.flutter.plugin.common.EventChannel
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_ANNOTATION_LIST
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_ANNOTATION_MENU_ITEM
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LONG_PRESS_MENU_ITEM
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LONG_PRESS_TEXT
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_PAGE_NUMBER
+import com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_PREVIOUS_PAGE_NUMBER
+import com.pdftron.pdftronflutter.helpers.PluginUtils.checkQuickMenu
+import com.pdftron.pdftronflutter.helpers.PluginUtils.convStringToAnnotType
+import com.pdftron.pdftronflutter.helpers.PluginUtils.getAnnotationsData
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.pdftron.pdf.Annot;
-import com.pdftron.pdf.Field;
-import com.pdftron.pdf.PDFViewCtrl;
-import com.pdftron.pdf.annots.Widget;
-import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
-import com.pdftron.pdf.tools.QuickMenu;
-import com.pdftron.pdf.tools.QuickMenuItem;
-import com.pdftron.pdf.tools.ToolManager;
-import com.pdftron.pdf.utils.AnnotUtils;
-import com.pdftron.pdf.utils.ViewerUtils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import io.flutter.plugin.common.EventChannel;
-
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_ANNOTATION_LIST;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_ANNOTATION_MENU_ITEM;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LONG_PRESS_MENU_ITEM;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_LONG_PRESS_TEXT;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_PAGE_NUMBER;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.KEY_PREVIOUS_PAGE_NUMBER;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.checkQuickMenu;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.convStringToAnnotType;
-import static com.pdftron.pdftronflutter.helpers.PluginUtils.getAnnotationsData;
-
-public class ViewerImpl {
-
-    private ViewerComponent mViewerComponent;
-
-    public ViewerImpl(@NonNull ViewerComponent component) {
-        mViewerComponent = component;
+class ViewerImpl(@NonNull component: ViewerComponent) {
+    private val mViewerComponent: ViewerComponent
+    fun addListeners(@NonNull toolManager: ToolManager) {
+        toolManager.addAnnotationModificationListener(mAnnotationModificationListener)
+        toolManager.addAnnotationsSelectionListener(mAnnotationsSelectionListener)
+        toolManager.addPdfDocModificationListener(mPdfDocModificationListener)
     }
 
-    public void addListeners(@NonNull ToolManager toolManager) {
-        toolManager.addAnnotationModificationListener(mAnnotationModificationListener);
-        toolManager.addAnnotationsSelectionListener(mAnnotationsSelectionListener);
-        toolManager.addPdfDocModificationListener(mPdfDocModificationListener);
+    fun addListeners(@NonNull pdfViewCtrlTabFragment: PdfViewCtrlTabFragment2) {
+        pdfViewCtrlTabFragment.addQuickMenuListener(mQuickMenuListener)
     }
 
-    public void addListeners(@NonNull PdfViewCtrlTabFragment2 pdfViewCtrlTabFragment) {
-        pdfViewCtrlTabFragment.addQuickMenuListener(mQuickMenuListener);
+    fun addListeners(@NonNull pdfViewCtrl: PDFViewCtrl) {
+        pdfViewCtrl.addOnCanvasSizeChangeListener(mOnCanvasSizeChangedListener)
+        pdfViewCtrl.addPageChangeListener(mPageChangedListener)
     }
 
-    public void addListeners(@NonNull PDFViewCtrl pdfViewCtrl) {
-        pdfViewCtrl.addOnCanvasSizeChangeListener(mOnCanvasSizeChangedListener);
-        pdfViewCtrl.addPageChangeListener(mPageChangedListener);
+    fun removeListeners(@NonNull toolManager: ToolManager) {
+        toolManager.removeAnnotationModificationListener(mAnnotationModificationListener)
+        toolManager.removeAnnotationsSelectionListener(mAnnotationsSelectionListener)
+        toolManager.removePdfDocModificationListener(mPdfDocModificationListener)
     }
 
-    public void removeListeners(@NonNull ToolManager toolManager) {
-        toolManager.removeAnnotationModificationListener(mAnnotationModificationListener);
-        toolManager.removeAnnotationsSelectionListener(mAnnotationsSelectionListener);
-        toolManager.removePdfDocModificationListener(mPdfDocModificationListener);
+    fun removeListeners(@NonNull pdfViewCtrlTabFragment: PdfViewCtrlTabFragment2) {
+        pdfViewCtrlTabFragment.removeQuickMenuListener(mQuickMenuListener)
     }
 
-    public void removeListeners(@NonNull PdfViewCtrlTabFragment2 pdfViewCtrlTabFragment) {
-        pdfViewCtrlTabFragment.removeQuickMenuListener(mQuickMenuListener);
+    fun removeListeners(@NonNull pdfViewCtrl: PDFViewCtrl) {
+        pdfViewCtrl.removeOnCanvasSizeChangeListener(mOnCanvasSizeChangedListener)
+        pdfViewCtrl.removePageChangeListener(mPageChangedListener)
     }
 
-    public void removeListeners(@NonNull PDFViewCtrl pdfViewCtrl) {
-        pdfViewCtrl.removeOnCanvasSizeChangeListener(mOnCanvasSizeChangedListener);
-        pdfViewCtrl.removePageChangeListener(mPageChangedListener);
-    }
-
-    private ToolManager.AnnotationModificationListener mAnnotationModificationListener = new ToolManager.AnnotationModificationListener() {
+    private val mAnnotationModificationListener: ToolManager.AnnotationModificationListener = object : AnnotationModificationListener() {
         @Override
-        public void onAnnotationsAdded(Map<Annot, Integer> map) {
-            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_ADD, map, mViewerComponent);
-
-            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_ADD, map, mViewerComponent);
+        fun onAnnotationsAdded(map: Map<Annot?, Integer?>?) {
+            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_ADD, map, mViewerComponent)
+            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_ADD, map, mViewerComponent)
         }
 
         @Override
-        public void onAnnotationsPreModify(Map<Annot, Integer> map) {
+        fun onAnnotationsPreModify(map: Map<Annot?, Integer?>?) {
         }
 
         @Override
-        public void onAnnotationsModified(Map<Annot, Integer> map, Bundle bundle) {
-            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_MODIFY, map, mViewerComponent);
-
-            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_MODIFY, map, mViewerComponent);
-
-            JSONArray fieldsArray = new JSONArray();
-
-            for (Annot annot : map.keySet()) {
+        fun onAnnotationsModified(map: Map<Annot?, Integer?>, bundle: Bundle?) {
+            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_MODIFY, map, mViewerComponent)
+            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_MODIFY, map, mViewerComponent)
+            val fieldsArray = JSONArray()
+            for (annot in map.keySet()) {
                 try {
-                    if (annot != null && annot.isValid() && annot.getType() == Annot.e_Widget) {
-
-                        String fieldName = null, fieldValue = null;
-
-                        Widget widget = new Widget(annot);
-                        Field field = widget.getField();
+                    if (annot != null && annot.isValid() && annot.getType() === Annot.e_Widget) {
+                        var fieldName: String? = null
+                        var fieldValue: String? = null
+                        val widget = Widget(annot)
+                        val field: Field = widget.getField()
                         if (field != null) {
-                            fieldName = field.getName();
-                            fieldValue = field.getValueAsString();
+                            fieldName = field.getName()
+                            fieldValue = field.getValueAsString()
                         }
-
                         if (fieldName != null && fieldValue != null) {
-                            JSONObject fieldObject = new JSONObject();
-                            fieldObject.put(PluginUtils.KEY_FIELD_NAME, fieldName);
-                            fieldObject.put(PluginUtils.KEY_FIELD_VALUE, fieldValue);
-                            fieldsArray.put(fieldObject);
+                            val fieldObject = JSONObject()
+                            fieldObject.put(PluginUtils.KEY_FIELD_NAME, fieldName)
+                            fieldObject.put(PluginUtils.KEY_FIELD_VALUE, fieldValue)
+                            fieldsArray.put(fieldObject)
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
-
-            EventChannel.EventSink eventSink = mViewerComponent.getFormFieldValueChangedEventEmitter();
+            val eventSink: EventChannel.EventSink = mViewerComponent.getFormFieldValueChangedEventEmitter()
             if (eventSink != null) {
-                eventSink.success(fieldsArray.toString());
+                eventSink.success(fieldsArray.toString())
             }
         }
 
         @Override
-        public void onAnnotationsPreRemove(Map<Annot, Integer> map) {
-            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_DELETE, map, mViewerComponent);
-
-            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_DELETE, map, mViewerComponent);
+        fun onAnnotationsPreRemove(map: Map<Annot?, Integer?>?) {
+            PluginUtils.emitAnnotationChangedEvent(PluginUtils.KEY_ACTION_DELETE, map, mViewerComponent)
+            PluginUtils.emitExportAnnotationCommandEvent(PluginUtils.KEY_ACTION_DELETE, map, mViewerComponent)
         }
 
         @Override
-        public void onAnnotationsRemoved(Map<Annot, Integer> map) {
-
+        fun onAnnotationsRemoved(map: Map<Annot?, Integer?>?) {
         }
 
         @Override
-        public void onAnnotationsRemovedOnPage(int i) {
-
+        fun onAnnotationsRemovedOnPage(i: Int) {
         }
 
         @Override
-        public void annotationsCouldNotBeAdded(String s) {
-
+        fun annotationsCouldNotBeAdded(s: String?) {
         }
-    };
-
-    private ToolManager.AnnotationsSelectionListener mAnnotationsSelectionListener = new ToolManager.AnnotationsSelectionListener() {
+    }
+    private val mAnnotationsSelectionListener: ToolManager.AnnotationsSelectionListener = object : AnnotationsSelectionListener() {
         @Override
-        public void onAnnotationsSelectionChanged(HashMap<Annot, Integer> hashMap) {
-            PluginUtils.emitAnnotationsSelectedEvent(hashMap, mViewerComponent);
+        fun onAnnotationsSelectionChanged(hashMap: HashMap<Annot?, Integer?>?) {
+            PluginUtils.emitAnnotationsSelectedEvent(hashMap, mViewerComponent)
         }
-    };
-
-    private ToolManager.PdfDocModificationListener mPdfDocModificationListener = new ToolManager.PdfDocModificationListener() {
+    }
+    private val mPdfDocModificationListener: ToolManager.PdfDocModificationListener = object : PdfDocModificationListener() {
         @Override
-        public void onBookmarkModified() {
-            String bookmarkJson = null;
+        fun onBookmarkModified() {
+            var bookmarkJson: String? = null
             try {
-                bookmarkJson = PluginUtils.generateBookmarkJson(mViewerComponent);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                bookmarkJson = PluginUtils.generateBookmarkJson(mViewerComponent)
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
-
-            EventChannel.EventSink eventSink = mViewerComponent.getExportBookmarkEventEmitter();
+            val eventSink: EventChannel.EventSink = mViewerComponent.getExportBookmarkEventEmitter()
             if (eventSink != null) {
-                eventSink.success(bookmarkJson);
+                eventSink.success(bookmarkJson)
             }
         }
 
         @Override
-        public void onPagesCropped() {
-
+        fun onPagesCropped() {
         }
 
         @Override
-        public void onPagesAdded(List<Integer> list) {
-
+        fun onPagesAdded(list: List<Integer?>?) {
         }
 
         @Override
-        public void onPagesDeleted(List<Integer> list) {
-
+        fun onPagesDeleted(list: List<Integer?>?) {
         }
 
         @Override
-        public void onPagesRotated(List<Integer> list) {
-
+        fun onPagesRotated(list: List<Integer?>?) {
         }
 
         @Override
-        public void onPageMoved(int i, int i1) {
-
+        fun onPageMoved(i: Int, i1: Int) {
         }
 
         @Override
-        public void onPageLabelsChanged() {
-
+        fun onPageLabelsChanged() {
         }
 
         @Override
-        public void onAllAnnotationsRemoved() {
-
+        fun onAllAnnotationsRemoved() {
         }
 
         @Override
-        public void onAnnotationAction() {
-
+        fun onAnnotationAction() {
         }
-    };
-
-    private ToolManager.QuickMenuListener mQuickMenuListener = new ToolManager.QuickMenuListener() {
+    }
+    private val mQuickMenuListener: ToolManager.QuickMenuListener = object : QuickMenuListener() {
         @Override
-        public boolean onQuickMenuClicked(QuickMenuItem quickMenuItem) {
-            String menuStr = PluginUtils.convQuickMenuIdToString(quickMenuItem.getItemId());
+        fun onQuickMenuClicked(quickMenuItem: QuickMenuItem): Boolean {
+            val menuStr: String = PluginUtils.convQuickMenuIdToString(quickMenuItem.getItemId())
 
             // check if this is an override menu
-            boolean result = false;
-
+            var result = false
             if (mViewerComponent.getPdfViewCtrl() != null && mViewerComponent.getToolManager() != null) {
 
                 // If annotations are selected - annotationMenu; Or: - longPressMenu
                 if (PluginUtils.hasAnnotationsSelected(mViewerComponent)) {
                     if (mViewerComponent.getAnnotationMenuOverrideItems() != null) {
-                        result = mViewerComponent.getAnnotationMenuOverrideItems().contains(menuStr);
+                        result = mViewerComponent.getAnnotationMenuOverrideItems().contains(menuStr)
                     }
-
                     try {
-                        JSONObject annotationMenuObject = new JSONObject();
-                        annotationMenuObject.put(KEY_ANNOTATION_MENU_ITEM, menuStr);
-                        annotationMenuObject.put(KEY_ANNOTATION_LIST, getAnnotationsData(mViewerComponent));
-
-                        EventChannel.EventSink eventSink = mViewerComponent.getAnnotationMenuPressedEventEmitter();
+                        val annotationMenuObject = JSONObject()
+                        annotationMenuObject.put(KEY_ANNOTATION_MENU_ITEM, menuStr)
+                        annotationMenuObject.put(KEY_ANNOTATION_LIST, getAnnotationsData(mViewerComponent))
+                        val eventSink: EventChannel.EventSink = mViewerComponent.getAnnotationMenuPressedEventEmitter()
                         if (eventSink != null) {
-                            eventSink.success(annotationMenuObject.toString());
+                            eventSink.success(annotationMenuObject.toString())
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 } else {
                     if (mViewerComponent.getLongPressMenuOverrideItems() != null) {
-                        result = mViewerComponent.getLongPressMenuOverrideItems().contains(menuStr);
+                        result = mViewerComponent.getLongPressMenuOverrideItems().contains(menuStr)
                     }
-
                     try {
-                        JSONObject longPressMenuObject = new JSONObject();
-                        longPressMenuObject.put(KEY_LONG_PRESS_MENU_ITEM, menuStr);
-                        longPressMenuObject.put(KEY_LONG_PRESS_TEXT, ViewerUtils.getSelectedString(mViewerComponent.getPdfViewCtrl()));
-
-                        EventChannel.EventSink eventSink = mViewerComponent.getLongPressMenuPressedEventEmitter();
+                        val longPressMenuObject = JSONObject()
+                        longPressMenuObject.put(KEY_LONG_PRESS_MENU_ITEM, menuStr)
+                        longPressMenuObject.put(KEY_LONG_PRESS_TEXT, ViewerUtils.getSelectedString(mViewerComponent.getPdfViewCtrl()))
+                        val eventSink: EventChannel.EventSink = mViewerComponent.getLongPressMenuPressedEventEmitter()
                         if (eventSink != null) {
-                            eventSink.success(longPressMenuObject.toString());
+                            eventSink.success(longPressMenuObject.toString())
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }
-
-            return result;
+            return result
         }
 
         @Override
-        public boolean onShowQuickMenu(QuickMenu quickMenu, @Nullable Annot annot) {
+        fun onShowQuickMenu(quickMenu: QuickMenu, @Nullable annot: Annot?): Boolean {
             if (mViewerComponent.getHideAnnotationMenuTools() != null && annot != null && mViewerComponent.getPdfViewCtrl() != null) {
-                for (String tool : mViewerComponent.getHideAnnotationMenuTools()) {
-                    int type = convStringToAnnotType(tool);
-                    boolean shouldUnlockRead = false;
+                for (tool in mViewerComponent.getHideAnnotationMenuTools()) {
+                    val type: Int = convStringToAnnotType(tool)
+                    var shouldUnlockRead = false
                     try {
-                        mViewerComponent.getPdfViewCtrl().docLockRead();
-                        shouldUnlockRead = true;
-
-                        int annotType = AnnotUtils.getAnnotType(annot);
+                        mViewerComponent.getPdfViewCtrl().docLockRead()
+                        shouldUnlockRead = true
+                        val annotType: Int = AnnotUtils.getAnnotType(annot)
                         if (annotType == type) {
-                            mViewerComponent.getPdfViewCtrl().docUnlockRead();
-                            return true;
+                            mViewerComponent.getPdfViewCtrl().docUnlockRead()
+                            return true
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     } finally {
                         if (shouldUnlockRead) {
-                            mViewerComponent.getPdfViewCtrl().docUnlockRead();
+                            mViewerComponent.getPdfViewCtrl().docUnlockRead()
                         }
                     }
                 }
@@ -292,66 +248,63 @@ public class ViewerImpl {
 
             // remove unwanted items
             if (mViewerComponent.getAnnotationMenuItems() != null && annot != null) {
-                List<QuickMenuItem> removeList = new ArrayList<>();
-                checkQuickMenu(quickMenu.getFirstRowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList);
-                checkQuickMenu(quickMenu.getSecondRowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList);
-                checkQuickMenu(quickMenu.getOverflowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList);
-                quickMenu.removeMenuEntries(removeList);
-
-                if (quickMenu.getFirstRowMenuItems().size() == 0) {
-                    quickMenu.setDividerVisibility(View.GONE);
+                val removeList: List<QuickMenuItem> = ArrayList()
+                checkQuickMenu(quickMenu.getFirstRowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList)
+                checkQuickMenu(quickMenu.getSecondRowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList)
+                checkQuickMenu(quickMenu.getOverflowMenuItems(), mViewerComponent.getAnnotationMenuItems(), removeList)
+                quickMenu.removeMenuEntries(removeList)
+                if (quickMenu.getFirstRowMenuItems().size() === 0) {
+                    quickMenu.setDividerVisibility(View.GONE)
                 }
             }
             if (mViewerComponent.getLongPressMenuItems() != null && null == annot) {
-                List<QuickMenuItem> removeList = new ArrayList<>();
-                checkQuickMenu(quickMenu.getFirstRowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList);
-                checkQuickMenu(quickMenu.getSecondRowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList);
-                checkQuickMenu(quickMenu.getOverflowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList);
-                quickMenu.removeMenuEntries(removeList);
-
-                if (quickMenu.getFirstRowMenuItems().size() == 0) {
-                    quickMenu.setDividerVisibility(View.GONE);
+                val removeList: List<QuickMenuItem> = ArrayList()
+                checkQuickMenu(quickMenu.getFirstRowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList)
+                checkQuickMenu(quickMenu.getSecondRowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList)
+                checkQuickMenu(quickMenu.getOverflowMenuItems(), mViewerComponent.getLongPressMenuItems(), removeList)
+                quickMenu.removeMenuEntries(removeList)
+                if (quickMenu.getFirstRowMenuItems().size() === 0) {
+                    quickMenu.setDividerVisibility(View.GONE)
                 }
             }
-            return false;
+            return false
         }
 
         @Override
-        public void onQuickMenuShown() {
-
+        fun onQuickMenuShown() {
         }
 
         @Override
-        public void onQuickMenuDismissed() {
-
+        fun onQuickMenuDismissed() {
         }
-    };
-
-    private PDFViewCtrl.OnCanvasSizeChangeListener mOnCanvasSizeChangedListener = new PDFViewCtrl.OnCanvasSizeChangeListener() {
+    }
+    private val mOnCanvasSizeChangedListener: PDFViewCtrl.OnCanvasSizeChangeListener = object : OnCanvasSizeChangeListener() {
         @Override
-        public void onCanvasSizeChanged() {
-            EventChannel.EventSink eventSink = mViewerComponent.getZoomChangedEventEmitter();
+        fun onCanvasSizeChanged() {
+            val eventSink: EventChannel.EventSink = mViewerComponent.getZoomChangedEventEmitter()
             if (eventSink != null && mViewerComponent.getPdfViewCtrl() != null) {
-                eventSink.success(mViewerComponent.getPdfViewCtrl().getZoom());
+                eventSink.success(mViewerComponent.getPdfViewCtrl().getZoom())
             }
         }
-    };
-
-    private PDFViewCtrl.PageChangeListener mPageChangedListener = new PDFViewCtrl.PageChangeListener() {
+    }
+    private val mPageChangedListener: PDFViewCtrl.PageChangeListener = object : PageChangeListener() {
         @Override
-        public void onPageChange(int old_page, int cur_page, PDFViewCtrl.PageChangeState pageChangeState) {
-            EventChannel.EventSink eventSink = mViewerComponent.getPageChangedEventEmitter();
-            if (eventSink != null && (old_page != cur_page || pageChangeState == PDFViewCtrl.PageChangeState.END)) {
-                JSONObject resultObject = new JSONObject();
+        fun onPageChange(old_page: Int, cur_page: Int, pageChangeState: PDFViewCtrl.PageChangeState) {
+            val eventSink: EventChannel.EventSink = mViewerComponent.getPageChangedEventEmitter()
+            if (eventSink != null && (old_page != cur_page || pageChangeState === PDFViewCtrl.PageChangeState.END)) {
+                val resultObject = JSONObject()
                 try {
-                    resultObject.put(KEY_PREVIOUS_PAGE_NUMBER, old_page);
-                    resultObject.put(KEY_PAGE_NUMBER, cur_page);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    resultObject.put(KEY_PREVIOUS_PAGE_NUMBER, old_page)
+                    resultObject.put(KEY_PAGE_NUMBER, cur_page)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-
-                eventSink.success(resultObject.toString());
+                eventSink.success(resultObject.toString())
             }
         }
-    };
+    }
+
+    init {
+        mViewerComponent = component
+    }
 }

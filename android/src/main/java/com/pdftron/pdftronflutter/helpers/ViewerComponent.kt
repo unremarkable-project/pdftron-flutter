@@ -1,85 +1,56 @@
-package com.pdftron.pdftronflutter.helpers;
+package com.pdftron.pdftronflutter.helpers
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.pdftron.pdf.Annot
+import com.pdftron.pdf.PDFDoc
+import com.pdftron.pdf.PDFViewCtrl
+import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2
+import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2
+import com.pdftron.pdf.tools.ToolManager
+import java.util.ArrayList
+import java.util.HashMap
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodChannel
 
-import com.pdftron.pdf.Annot;
-import com.pdftron.pdf.PDFDoc;
-import com.pdftron.pdf.PDFViewCtrl;
-import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
-import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
-import com.pdftron.pdf.tools.ToolManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import io.flutter.plugin.common.EventChannel;
-import io.flutter.plugin.common.MethodChannel;
-
-public interface ViewerComponent {
-
-    ArrayList<String> getLongPressMenuItems();
-
-    ArrayList<String> getLongPressMenuOverrideItems();
-
-    ArrayList<String> getHideAnnotationMenuTools();
-
-    ArrayList<String> getAnnotationMenuItems();
-
-    ArrayList<String> getAnnotationMenuOverrideItems();
-    
-    boolean isAutoSaveEnabled();
-
-    boolean isUseStylusAsPen();
-
-    boolean isSignSignatureFieldWithStamps();
-
-    void setSelectedAnnots(HashMap<Annot, Integer> selectedAnnots);
-
-    EventChannel.EventSink getExportAnnotationCommandEventEmitter();
-
-    EventChannel.EventSink getExportBookmarkEventEmitter();
-
-    EventChannel.EventSink getDocumentLoadedEventEmitter();
-
-    EventChannel.EventSink getDocumentErrorEventEmitter();
-
-    EventChannel.EventSink getAnnotationChangedEventEmitter();
-
-    EventChannel.EventSink getAnnotationsSelectedEventEmitter();
-
-    EventChannel.EventSink getFormFieldValueChangedEventEmitter();
-
-    EventChannel.EventSink getLongPressMenuPressedEventEmitter();
-
-    EventChannel.EventSink getAnnotationMenuPressedEventEmitter();
-
-    EventChannel.EventSink getLeadingNavButtonPressedEventEmitter();
-
-    EventChannel.EventSink getPageChangedEventEmitter();
-
-    EventChannel.EventSink getZoomChangedEventEmitter();
-
-    MethodChannel.Result getFlutterLoadResult();
-
-    HashMap<Annot, Integer> getSelectedAnnots();
+interface ViewerComponent {
+    val longPressMenuItems: ArrayList<String?>?
+    val longPressMenuOverrideItems: ArrayList<String?>?
+    val hideAnnotationMenuTools: ArrayList<String?>?
+    val annotationMenuItems: ArrayList<String?>?
+    val annotationMenuOverrideItems: ArrayList<String?>?
+    val isAutoSaveEnabled: Boolean
+    val isUseStylusAsPen: Boolean
+    val isSignSignatureFieldWithStamps: Boolean
+    val exportAnnotationCommandEventEmitter: EventChannel.EventSink?
+    val exportBookmarkEventEmitter: EventChannel.EventSink?
+    val documentLoadedEventEmitter: EventChannel.EventSink?
+    val documentErrorEventEmitter: EventChannel.EventSink?
+    val annotationChangedEventEmitter: EventChannel.EventSink?
+    val annotationsSelectedEventEmitter: EventChannel.EventSink?
+    val formFieldValueChangedEventEmitter: EventChannel.EventSink?
+    val longPressMenuPressedEventEmitter: EventChannel.EventSink?
+    val annotationMenuPressedEventEmitter: EventChannel.EventSink?
+    val leadingNavButtonPressedEventEmitter: EventChannel.EventSink?
+    val pageChangedEventEmitter: EventChannel.EventSink?
+    val zoomChangedEventEmitter: EventChannel.EventSink?
+    val flutterLoadResult: MethodChannel.Result?
+    var selectedAnnots: HashMap<Annot?, Integer?>?
 
     // Convenience
-    @Nullable
-    PdfViewCtrlTabHostFragment2 getPdfViewCtrlTabHostFragment();
+    @get:Nullable
+    val pdfViewCtrlTabHostFragment: PdfViewCtrlTabHostFragment2?
 
-    @Nullable
-    PdfViewCtrlTabFragment2 getPdfViewCtrlTabFragment();
+    @get:Nullable
+    val pdfViewCtrlTabFragment: PdfViewCtrlTabFragment2?
 
-    @Nullable
-    PDFViewCtrl getPdfViewCtrl();
+    @get:Nullable
+    val pdfViewCtrl: PDFViewCtrl?
 
-    @Nullable
-    ToolManager getToolManager();
+    @get:Nullable
+    val toolManager: ToolManager?
 
-    @Nullable
-    PDFDoc getPdfDoc();
+    @get:Nullable
+    val pdfDoc: PDFDoc?
 
-    @NonNull
-    ViewerImpl getImpl();
+    @get:NonNull
+    val impl: ViewerImpl?
 }
