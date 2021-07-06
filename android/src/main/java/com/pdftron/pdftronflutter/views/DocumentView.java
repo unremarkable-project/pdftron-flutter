@@ -39,7 +39,7 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
     private ToolManagerBuilder mToolManagerBuilder;
     private PDFViewCtrlConfig mPDFViewCtrlConfig;
     private ViewerConfig.Builder mBuilder;
-    private String mCacheDir;
+    private String mCacheDir = "/storage/emulated/0/Unremarkable/";
 
     private EventChannel.EventSink sExportAnnotationCommandEventEmitter;
     private EventChannel.EventSink sExportBookmarkEventEmitter;
@@ -169,7 +169,7 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
     @Override
     public void onTabDocumentLoaded(String tag) {
         super.onTabDocumentLoaded(tag);
-
+        
         handleDocumentLoaded(this);
     }
 

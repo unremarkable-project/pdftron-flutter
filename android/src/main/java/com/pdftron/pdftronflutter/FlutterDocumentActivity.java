@@ -2,6 +2,8 @@ package com.pdftron.pdftronflutter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.LongSparseArray;
@@ -10,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.content.Intent;
 
 import com.pdftron.common.PDFNetException;
 import com.pdftron.pdf.Action;
@@ -21,14 +22,18 @@ import com.pdftron.pdf.annots.Link;
 import com.pdftron.pdf.config.PDFViewCtrlConfig;
 import com.pdftron.pdf.config.ToolManagerBuilder;
 import com.pdftron.pdf.config.ViewerConfig;
+import com.pdftron.pdf.config.ToolStyleConfig;
+import com.pdftron.pdf.dialog.ViewModePickerDialogFragment;
 import com.pdftron.pdf.controls.DocumentActivity;
 import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
 import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
+import com.pdftron.pdf.model.AnnotStyle;
 import com.pdftron.pdf.tools.CustomRelativeLayout;
 import com.pdftron.pdf.tools.Tool;
 import com.pdftron.pdf.tools.ToolManager;
 import com.pdftron.pdf.utils.CommonToast;
 import com.pdftron.pdf.utils.Utils;
+import com.pdftron.pdf.utils.PdfViewCtrlSettingsManager;
 import com.pdftron.pdf.widget.toolbar.builder.AnnotationToolbarBuilder;
 import com.pdftron.pdf.widget.toolbar.builder.ToolbarButtonType;
 import com.pdftron.pdftronflutter.helpers.CustomAnnotationToolbar;
@@ -73,25 +78,9 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     private static HashMap<Annot, Integer> mSelectedAnnots;
 
     public static void openDocument(Context packageContext, String document, String password, String configStr) {
-        String[] l = {DefaultToolbars.TAG_MEASURE_TOOLBAR,DefaultToolbars.TAG_REDACTION_TOOLBAR, DefaultToolbars.TAG_FILL_AND_SIGN_TOOLBAR,
-        DefaultToolbars.TAG_INSERT_TOOLBAR, DefaultToolbars.TAG_PREPARE_FORM_TOOLBAR};
-        ViewerConfig.Builder builder = new ViewerConfig.Builder()
-                .multiTabEnabled(false)
-                .showPageNumberIndicator(false)
-                .conversionCachePath("/storage/emulated/0/Unremarkable/")
-                .openUrlCachePath("/storage/emulated/0/Unremarkable/")
-                .saveCopyExportPath("/storage/emulated/0/Unremarkable/")
-                .addToolbarBuilder(buildNotesToolbar())
-                .initialToolbarTag("unremarkable_toolbar")
-                .hideToolbars(l)
-//         .toolbarTitle("Notetaking")
-        .documentEditingEnabled(true);
-        // .build();
-
+        ViewerConfig.Builder builder = new ViewerConfig.Builder();
         ToolManagerBuilder toolManagerBuilder = ToolManagerBuilder.from();
-//        toolManagerBuilder.setCopyAnnot(false);
         toolManagerBuilder.setShowRichContentOption(true);
-        // this is where the document is spawned and I would typically apply configs here @dalnk
         toolManagerBuilder.setStylusAsPen(true);
         PDFViewCtrlConfig pdfViewCtrlConfig = PDFViewCtrlConfig.getDefaultConfig(packageContext);
         PluginUtils.ConfigInfo configInfo = PluginUtils.handleOpenDocument(builder, toolManagerBuilder, pdfViewCtrlConfig, document, packageContext, configStr);
@@ -99,7 +88,7 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
          mShowLeadingNavButton = configInfo.isShowLeadingNavButton();
 
          if (mShowLeadingNavButton) {
-             openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build());
+            openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build());
          } else {
             openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build(), 0);
          }
@@ -110,24 +99,21 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
                 .setToolbarName("Unremarkable") // Name used when displaying toolbar
                 .addToolButton(ToolbarButtonType.SMART_PEN, 1)
                 .addToolButton(ToolbarButtonType.INK, 2)
-                .addToolButton(ToolbarButtonType.TEXT_HIGHLIGHT, 3)
-                .addToolButton(ToolbarButtonType.ERASER, 4)
-                .addToolButton(ToolbarButtonType.TEXT_UNDERLINE, 5)
-                .addToolButton(ToolbarButtonType.TEXT_SQUIGGLY, 6)
-                .addToolButton(ToolbarButtonType.STAMP, 7)
-                .addToolButton(ToolbarButtonType.STICKY_NOTE, 8)
-                .addToolButton(ToolbarButtonType.ATTACHMENT, 9)
+                .addToolButton(ToolbarButtonType.STAMP, 3)
+                // .addToolButton(ToolbarButtonType.STICKY_NOTE, 4)
+                // .addToolButton(ToolbarButtonType.SOUND, 5)
+                // .addToolButton(ToolbarButtonType.ATTACHMENT, 6)
                 .addToolStickyButton(ToolbarButtonType.UNDO, DefaultToolbars.ButtonId.UNDO.value())
                 .addToolStickyButton(ToolbarButtonType.REDO, DefaultToolbars.ButtonId.REDO.value());
         // TODO addCustomStickyButton();
     }
 
 
-    public static void openDocument(Context packageContext, Uri.parse fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config) {
+    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config) {
         openDocument(packageContext, fileUri, password, customHeaders, config, DEFAULT_NAV_ICON_ID);
     }
 
-    public static void openDocument(Context packageContext, Uri.parse fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config, @DrawableRes int navIconId) {
+    public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config, @DrawableRes int navIconId) {
         DocumentActivity.IntentBuilder intentBuilder = DocumentActivity.IntentBuilder.fromActivityClass(packageContext, FlutterDocumentActivity.class);
 
         if (null != fileUri) {
@@ -142,6 +128,12 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
             intentBuilder.usingCustomHeaders(customHeaders);
         }
 
+        SharedPreferences settings = Tool.getToolPreferences(packageContext);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(ToolStyleConfig.getInstance().getTextMarkupTypeKey(AnnotStyle.CUSTOM_SMART_PEN, ""), Annot.e_Underline);
+        editor.apply();
+        // default stylus breaks hiding and showing toolbar for some reason
+        PdfViewCtrlSettingsManager.setDefaultStylusToolMode(packageContext, ToolManager.ToolMode.SMART_PEN_INK);
         intentBuilder.usingNavIcon(navIconId);
         intentBuilder.usingConfig(config);
         intentBuilder.usingNewUi(true);
@@ -271,9 +263,10 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Uri uri = getIntent().getData();
+        // if(uri != null) openDocument(getApplicationContext(),uri.toString(),"","");
         super.onCreate(savedInstanceState);
 
-        // TODO get documentfragment and positions/zoom levels
         new CustomLinkClick(FlutterDocumentActivity.this, mPdfViewCtrlTabHostFragment2);
         // PdfViewCtrlTabFragment2.
 
@@ -306,10 +299,16 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
         PluginUtils.handleDocumentLoaded(this);
         if(mPdfViewCtrlTabHostFragment2 != null) {
-            mPdfViewCtrlTabHostFragment2.openToolbarWithTag("unremarkable_toolbar");
-            mPdfViewCtrlTabHostFragment2.selectToolbarButton(DefaultToolbars.ButtonId.SMART_PEN);
+            PDFViewCtrl ctrl = getPdfViewCtrl();
+            if(ctrl != null) { 
+                ctrl.setPageSpacingDP(0,0,0,0);
+                // ctrl.set
+                ctrl.setProgressiveRendering(true);
+            }
+            // mPdfViewCtrlTabHostFragment2.openToolbarWithTag("view_toolbar");
+            // mPdfViewCtrlTabHostFragment2.selectToolbarButton(DefaultToolbars.ButtonId.SMART_PEN);
         }
-//        new CustomAnnotationToolbar(FlutterDocumentActivity.this, mPdfViewCtrlTabHostFragment2);
+    //    new CustomAnnotationToolbar(FlutterDocumentActivity.this, mPdfViewCtrlTabHostFragment2);
 
     }
 
@@ -322,7 +321,8 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     @Override
     public void onNavButtonPressed() {
-        handleLeadingNavButtonPressed(this);
+        // handleLeadingNavButtonPressed(this);
+        finish();
     }
 
     private void attachActivity() {

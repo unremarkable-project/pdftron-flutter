@@ -2,11 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.pdftron.pdftronflutter">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application>
 
         <!-- Document viewer activity declaration-->
         <activity
             android:name=".FlutterDocumentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:theme="@style/PDFTronAppTheme"
+            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".IntentDocumentActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:theme="@style/PDFTronAppTheme"
             android:windowSoftInputMode="adjustPan">

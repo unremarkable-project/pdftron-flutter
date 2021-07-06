@@ -19,9 +19,11 @@ import com.pdftron.pdf.Rect;
 import com.pdftron.pdf.ViewChangeCollection;
 import com.pdftron.pdf.config.PDFViewCtrlConfig;
 import com.pdftron.pdf.config.ToolManagerBuilder;
+import com.pdftron.pdf.config.ToolStyleConfig;
 import com.pdftron.pdf.config.ViewerConfig;
 import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
 import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
+import com.pdftron.pdf.dialog.ViewModePickerDialogFragment;
 import com.pdftron.pdf.tools.AdvancedShapeCreate;
 import com.pdftron.pdf.tools.FreehandCreate;
 import com.pdftron.pdf.tools.Tool;
@@ -71,22 +73,50 @@ public class PluginUtils {
     public static final String KEY_ANNOTATION = "annotation";
     public static final String KEY_FORMS_ONLY = "formsOnly";
     public static final String KEY_ANNOTATIONS_WITH_FLAGS = "annotationsWithFlags";
+    public static final String KEY_ANNOTATION_PROPERTIES = "annotationProperties";
     public static final String KEY_LEADING_NAV_BUTTON_ICON = "leadingNavButtonIcon";
 
     public static final String KEY_CONFIG_DISABLED_ELEMENTS = "disabledElements";
     public static final String KEY_CONFIG_DISABLED_TOOLS = "disabledTools";
     public static final String KEY_CONFIG_MULTI_TAB_ENABLED = "multiTabEnabled";
     public static final String KEY_CONFIG_CUSTOM_HEADERS = "customHeaders";
+    public static final String KEY_CONFIG_FIT_MODE = "fitMode";
+    public static final String KEY_CONFIG_LAYOUT_MODE = "layoutMode";
+    public static final String KEY_CONFIG_INITIAL_PAGE_NUMBER = "initialPageNumber";
+    public static final String KEY_CONFIG_IS_BASE_64_STRING = "isBase64String";
+    public static final String KEY_CONFIG_BASE_64_FILE_EXTENSION = "base64FileExtension";
+    public static final String KEY_CONFIG_HIDE_THUMBNAIL_FILTER_MODES = "hideThumbnailFilterModes";
+    public static final String KEY_CONFIG_LONG_PRESS_MENU_ENABLED = "longPressMenuEnabled";
+    public static final String KEY_CONFIG_LONG_PRESS_MENU_ITEMS = "longPressMenuItems";
+    public static final String KEY_CONFIG_OVERRIDE_LONG_PRESS_MENU_BEHAVIOR = "overrideLongPressMenuBehavior";
+    public static final String KEY_CONFIG_HIDE_ANNOTATION_MENU = "hideAnnotationMenu";
+    public static final String KEY_CONFIG_ANNOTATION_MENU_ITEMS = "annotationMenuItems";
+    public static final String KEY_CONFIG_OVERRIDE_ANNOTATION_MENU_BEHAVIOR = "overrideAnnotationMenuBehavior";
+    public static final String KEY_CONFIG_EXPORT_PATH = "exportPath";
+    public static final String KEY_CONFIG_OPEN_URL_PATH = "openUrlPath";
+    public static final String KEY_CONFIG_AUTO_SAVE_ENABLED = "autoSaveEnabled";
+    public static final String KEY_CONFIG_PAGE_CHANGE_ON_TAP = "pageChangeOnTap";
+    public static final String KEY_CONFIG_SHOW_SAVED_SIGNATURES = "showSavedSignatures";
+    public static final String KEY_CONFIG_USE_STYLUS_AS_PEN = "useStylusAsPen";
+    public static final String KEY_CONFIG_SIGN_SIGNATURE_FIELD_WITH_STAMPS = "signSignatureFieldWithStamps";
+    public static final String KEY_CONFIG_SELECT_ANNOTATION_AFTER_CREATION = "selectAnnotationAfterCreation";
+    public static final String KEY_CONFIG_PAGE_INDICATOR_ENABLED = "pageIndicatorEnabled";
+    public static final String KEY_CONFIG_FOLLOW_SYSTEM_DARK_MODE = "followSystemDarkMode";
     public static final String KEY_CONFIG_ANNOTATION_TOOLBARS = "annotationToolbars";
     public static final String KEY_CONFIG_HIDE_DEFAULT_ANNOTATION_TOOLBARS = "hideDefaultAnnotationToolbars";
     public static final String KEY_CONFIG_HIDE_ANNOTATION_TOOLBAR_SWITCHER = "hideAnnotationToolbarSwitcher";
     public static final String KEY_CONFIG_HIDE_TOP_TOOLBARS = "hideTopToolbars";
     public static final String KEY_CONFIG_HIDE_TOP_APP_NAV_BAR = "hideTopAppNavBar";
+    public static final String KEY_CONFIG_HIDE_BOTTOM_TOOLBAR = "hideBottomToolbar";
     public static final String KEY_CONFIG_SHOW_LEADING_NAV_BUTTON = "showLeadingNavButton";
     public static final String KEY_CONFIG_READ_ONLY = "readOnly";
     public static final String KEY_CONFIG_THUMBNAIL_VIEW_EDITING_ENABLED = "thumbnailViewEditingEnabled";
     public static final String KEY_CONFIG_ANNOTATION_AUTHOR = "annotationAuthor";
     public static final String KEY_CONFIG_CONTINUOUS_ANNOTATION_EDITING = "continuousAnnotationEditing";
+    public static final String KEY_CONFIG_ANNOTATION_PERMISSION_CHECK_ENABLED = "annotationPermissionCheckEnabled";
+    public static final String KEY_CONFIG_OVERRIDE_BEHAVIOR = "overrideBehavior";
+    public static final String KEY_CONFIG_TAB_TITLE = "tabTitle";
+    public static final String KEY_CONFIG_PERMANENT_PAGE_NUMBER_INDICATOR = "pageNumberIndicatorAlwaysVisible";
 
     public static final String KEY_X1 = "x1";
     public static final String KEY_Y1 = "y1";
@@ -95,6 +125,11 @@ public class PluginUtils {
     public static final String KEY_WIDTH = "width";
     public static final String KEY_HEIGHT = "height";
     public static final String KEY_RECT = "rect";
+    public static final String KEY_SUBJECT = "subject";
+    public static final String KEY_TITLE = "title";
+    public static final String KEY_CONTENTS = "contents";
+    public static final String KEY_CONTENT_RECT = "contentRect";
+    public static final String KEY_ROTATION = "rotation";
 
     public static final String KEY_FIELD_NAME = "fieldName";
     public static final String KEY_FIELD_VALUE = "fieldValue";
@@ -108,9 +143,19 @@ public class PluginUtils {
     public static final String KEY_ACTION_DELETE = "delete";
     public static final String KEY_ACTION = "action";
 
+    public static final String KEY_DATA = "data";
+
     public static final String KEY_ANNOTATION_FLAG_LISTS = "flags";
     public static final String KEY_ANNOTATION_FLAG = "flag";
     public static final String KEY_ANNOTATION_FLAG_VALUE = "flagValue";
+
+    public static final String BEHAVIOR_LINK_PRESS = "linkPress";
+    public static final String KEY_LINK_BEHAVIOR_DATA = "url";
+
+    public static final String KEY_ANNOTATION_MENU_ITEM = "annotationMenuItem";
+
+    public static final String KEY_LONG_PRESS_MENU_ITEM = "longPressMenuItem";
+    public static final String KEY_LONG_PRESS_TEXT = "longPressText";
 
     public static final String EVENT_EXPORT_ANNOTATION_COMMAND = "export_annotation_command_event";
     public static final String EVENT_EXPORT_BOOKMARK = "export_bookmark_event";
@@ -119,6 +164,9 @@ public class PluginUtils {
     public static final String EVENT_ANNOTATION_CHANGED = "annotation_changed_event";
     public static final String EVENT_ANNOTATIONS_SELECTED = "annotations_selected_event";
     public static final String EVENT_FORM_FIELD_VALUE_CHANGED = "form_field_value_changed_event";
+    public static final String EVENT_BEHAVIOR_ACTIVATED = "behavior_activated_event";
+    public static final String EVENT_LONG_PRESS_MENU_PRESSED = "long_press_menu_pressed_event";
+    public static final String EVENT_ANNOTATION_MENU_PRESSED = "annotation_menu_pressed_event";
     public static final String EVENT_LEADING_NAV_BUTTON_PRESSED = "leading_nav_button_pressed_event";
     public static final String EVENT_PAGE_CHANGED = "page_changed_event";
     public static final String EVENT_ZOOM_CHANGED = "zoom_changed_event";
@@ -134,6 +182,8 @@ public class PluginUtils {
     public static final String FUNCTION_GET_PAGE_COUNT = "getPageCount";
     public static final String FUNCTION_HANDLE_BACK_BUTTON = "handleBackButton";
     public static final String FUNCTION_GET_PAGE_CROP_BOX = "getPageCropBox";
+    public static final String FUNCTION_SET_CURRENT_PAGE = "setCurrentPage";
+    public static final String FUNCTION_GET_DOCUMENT_PATH = "getDocumentPath";
     public static final String FUNCTION_SET_TOOL_MODE = "setToolMode";
     public static final String FUNCTION_SET_FLAG_FOR_FIELDS = "setFlagForFields";
     public static final String FUNCTION_SET_VALUES_FOR_FIELDS = "setValuesForFields";
@@ -143,7 +193,11 @@ public class PluginUtils {
     public static final String FUNCTION_DELETE_ANNOTATIONS = "deleteAnnotations";
     public static final String FUNCTION_SELECT_ANNOTATION = "selectAnnotation";
     public static final String FUNCTION_SET_FLAGS_FOR_ANNOTATIONS = "setFlagsForAnnotations";
+    public static final String FUNCTION_SET_PROPERTIES_FOR_ANNOTATION = "setPropertiesForAnnotation";
     public static final String FUNCTION_SET_LEADING_NAV_BUTTON_ICON = "setLeadingNavButtonIcon";
+    public static final String FUNCTION_CLOSE_ALL_TABS = "closeAllTabs";
+    public static final String FUNCTION_DELETE_ALL_ANNOTATIONS = "deleteAllAnnotations";
+    public static final String FUNCTION_GET_PAGE_ROTATION = "getPageRotation";
 
     public static final String BUTTON_TOOLS = "toolsButton";
     public static final String BUTTON_SEARCH = "searchButton";
@@ -158,8 +212,16 @@ public class PluginUtils {
     public static final String BUTTON_FILL_AND_SIGN = "fillAndSignButton";
     public static final String BUTTON_PREPARE_FORM = "prepareFormButton";
     public static final String BUTTON_REFLOW_MODE = "reflowModeButton";
+    public static final String BUTTON_CLOSE = "closeButton";
+    public static final String BUTTON_OUTLINE_LIST = "outlineListButton";
+    public static final String BUTTON_ANNOTATION_LIST = "annotationListButton";
+    public static final String BUTTON_USER_BOOKMARK_LIST = "userBookmarkListButton";
+    public static final String BUTTON_EDIT_MENU = "editMenuButton";
+    public static final String BUTTON_CROP_PAGE = "cropPageButton";
+    public static final String BUTTON_MORE_ITEMS = "moreItemsButton";
     public static final String BUTTON_UNDO = "undo";
     public static final String BUTTON_REDO = "redo";
+    public static final String BUTTON_EDIT_ANNOTATION_TOOLBAR = "editAnnotationToolButton";
 
     public static final String TOOL_BUTTON_FREE_HAND = "freeHandToolButton";
     public static final String TOOL_BUTTON_HIGHLIGHT = "highlightToolButton";
@@ -198,6 +260,7 @@ public class PluginUtils {
     public static final String TOOL_ANNOTATION_CREATE_STAMP = "AnnotationCreateStamp";
     public static final String TOOL_ANNOTATION_CREATE_DISTANCE_MEASUREMENT = "AnnotationCreateDistanceMeasurement";
     public static final String TOOL_ANNOTATION_CREATE_PERIMETER_MEASUREMENT = "AnnotationCreatePerimeterMeasurement";
+    public static final String TOOL_ANNOTATION_CREATE_RECTANGLE_AREA_MEASUREMENT = "AnnotationCreateRectangleAreaMeasurement";
     public static final String TOOL_ANNOTATION_CREATE_AREA_MEASUREMENT = "AnnotationCreateAreaMeasurement";
     public static final String TOOL_ANNOTATION_CREATE_FILE_ATTACHMENT = "AnnotationCreateFileAttachment";
     public static final String TOOL_TEXT_SELECT = "TextSelect";
@@ -215,7 +278,10 @@ public class PluginUtils {
     public static final String TOOL_FORM_CREATE_SIGNATURE_FIELD = "FormCreateSignatureField";
     public static final String TOOL_FORM_CREATE_RADIO_FIELD = "FormCreateRadioField";
     public static final String TOOL_FORM_CREATE_COMBO_BOX_FIELD = "FormCreateComboBoxField";
+    public static final String TOOL_FORM_CREATE_TOOL_BOX_FIELD = "FormCreateToolBoxField";
     public static final String TOOL_FORM_CREATE_LIST_BOX_FIELD = "FormCreateListBoxField";
+    public static final String TOOL_ANNOTATION_SMART_PEN = "AnnotationSmartPen";
+    public static final String TOOL_ANNOTATION_LASSO = "AnnotationLasso";
 
     public static final String ANNOTATION_FLAG_HIDDEN = "hidden";
     public static final String ANNOTATION_FLAG_INVISIBLE = "invisible";
@@ -228,6 +294,95 @@ public class PluginUtils {
     public static final String ANNOTATION_FLAG_READ_ONLY = "readOnly";
     public static final String ANNOTATION_FLAG_TOGGLE_NO_VIEW = "toggleNoView";
 
+    private static final String LAYOUT_MODE_SINGLE = "Single";
+    private static final String LAYOUT_MODE_CONTINUOUS = "Continuous";
+    private static final String LAYOUT_MODE_FACING = "facing";
+    private static final String LAYOUT_MODE_FACING_CONTINUOUS = "facingContinuous";
+    private static final String LAYOUT_MODE_FACING_OVER = "facingOver";
+    private static final String LAYOUT_MODE_FACING_OVER_CONTINUOUS = "facingOverContinuous";
+
+    private static final String FIT_MODE_FIT_PAGE = "FitPage";
+    private static final String FIT_MODE_FIT_WIDTH = "FitWidth";
+    private static final String FIT_MODE_FIT_HEIGHT = "FitHeight";
+    private static final String FIT_MODE_ZOOM = "Zoom";
+
+    public static final String THUMBNAIL_FILTER_MODE_ANNOTATED = "annotated";
+    public static final String THUMBNAIL_FILTER_MODE_BOOKMARKED = "bookmarked";
+
+    public static final String MENU_ID_STRING_STYLE = "style";
+    public static final String MENU_ID_STRING_NOTE = "note";
+    public static final String MENU_ID_STRING_COPY = "copy";
+    public static final String MENU_ID_STRING_DELETE = "delete";
+    public static final String MENU_ID_STRING_FLATTEN = "flatten";
+    public static final String MENU_ID_STRING_TEXT = "text";
+    public static final String MENU_ID_STRING_EDIT_INK = "editInk";
+    public static final String MENU_ID_STRING_SEARCH = "search";
+    public static final String MENU_ID_STRING_SHARE = "share";
+    public static final String MENU_ID_STRING_MARKUP_TYPE = "markupType";
+    public static final String MENU_ID_STRING_SCREEN_CAPTURE = "screenCapture";
+    public static final String MENU_ID_STRING_PLAY_SOUND = "playSound";
+    public static final String MENU_ID_STRING_OPEN_ATTACHMENT = "openAttachment";
+    public static final String MENU_ID_STRING_READ = "read";
+    public static final String MENU_ID_STRING_CALIBRATE = "calibrate";
+    public static final String MENU_ID_STRING_REDACT = "redact";
+    public static final String MENU_ID_STRING_REDACTION = "redaction";
+    public static final String MENU_ID_STRING_UNDERLINE = "underline";
+    public static final String MENU_ID_STRING_STRIKEOUT = "strikeout";
+    public static final String MENU_ID_STRING_SQUIGGLY = "squiggly";
+    public static final String MENU_ID_STRING_LINK = "link";
+    public static final String MENU_ID_STRING_HIGHLIGHT = "highlight";
+    public static final String MENU_ID_STRING_SIGNATURE = "signature";
+    public static final String MENU_ID_STRING_RECTANGLE = "rectangle";
+    public static final String MENU_ID_STRING_LINE = "line";
+    public static final String MENU_ID_STRING_FREE_HAND = "freeHand";
+    public static final String MENU_ID_STRING_IMAGE = "image";
+    public static final String MENU_ID_STRING_FORM_TEXT = "formText";
+    public static final String MENU_ID_STRING_STICKY_NOTE = "stickyNote";
+    public static final String MENU_ID_STRING_OVERFLOW = "overflow";
+    public static final String MENU_ID_STRING_ERASER = "eraser";
+    public static final String MENU_ID_STRING_STAMP = "rubberStamp";
+    public static final String MENU_ID_STRING_PAGE_REDACTION = "pageRedaction";
+    public static final String MENU_ID_STRING_RECT_REDACTION = "rectRedaction";
+    public static final String MENU_ID_STRING_SEARCH_REDACTION = "searchRedaction";
+    public static final String MENU_ID_STRING_SHAPE = "shape";
+    public static final String MENU_ID_STRING_CLOUD = "cloud";
+    public static final String MENU_ID_STRING_POLYGON = "polygon";
+    public static final String MENU_ID_STRING_POLYLINE = "polyline";
+    public static final String MENU_ID_STRING_FREE_HIGHLIGHTER = "freeHighlighter";
+    public static final String MENU_ID_STRING_ARROW = "arrow";
+    public static final String MENU_ID_STRING_OVAL = "oval";
+    public static final String MENU_ID_STRING_CALLOUT = "callout";
+    public static final String MENU_ID_STRING_MEASUREMENT = "measurement";
+    public static final String MENU_ID_STRING_AREA_MEASUREMENT = "areaMeasurement";
+    public static final String MENU_ID_STRING_PERIMETER_MEASUREMENT = "perimeterMeasurement";
+    public static final String MENU_ID_STRING_RECT_AREA_MEASUREMENT = "rectAreaMeasurement";
+    public static final String MENU_ID_STRING_RULER = "ruler";
+    public static final String MENU_ID_STRING_FORM = "form";
+    public static final String MENU_ID_STRING_FORM_COMBO_BOX = "formComboBox";
+    public static final String MENU_ID_STRING_FORM_LIST_BOX = "formListBox";
+    public static final String MENU_ID_STRING_FORM_CHECK_BOX = "formCheckBox";
+    public static final String MENU_ID_STRING_FORM_SIGNATURE = "formSignature";
+    public static final String MENU_ID_STRING_FORM_RADIO_GROUP = "formRadioGroup";
+    public static final String MENU_ID_STRING_ATTACH = "attach";
+    public static final String MENU_ID_STRING_FILE_ATTACHMENT = "fileAttachment";
+    public static final String MENU_ID_STRING_SOUND = "sound";
+    public static final String MENU_ID_STRING_FREE_TEXT = "freeText";
+    public static final String MENU_ID_STRING_CROP = "crop";
+    public static final String MENU_ID_STRING_CROP_OK = "crossOK";
+    public static final String MENU_ID_STRING_CROP_CANCEL = "crossCancel";
+    public static final String MENU_ID_STRING_DEFINE = "define";
+    public static final String MENU_ID_STRING_FIELD_SIGNED = "fieldSigned";
+    public static final String MENU_ID_STRING_FIRST_ROW_GROUP = "firstRowGroup";
+    public static final String MENU_ID_STRING_SECOND_ROW_GROUP = "secondRowGroup";
+    public static final String MENU_ID_STRING_GROUP = "group";
+    public static final String MENU_ID_STRING_PASTE = "paste";
+    public static final String MENU_ID_STRING_RECT_GROUP_SELECT = "rectGroupSelect";
+    public static final String MENU_ID_STRING_SIGN_AND_SAVE = "signAndSave";
+    public static final String MENU_ID_STRING_THICKNESS = "thickness";
+    public static final String MENU_ID_STRING_TRANSLATE = "translate";
+    public static final String MENU_ID_STRING_TYPE = "type";
+    public static final String MENU_ID_STRING_UNGROUP = "ungroup";
+
     // Toolbars
     public static final String TAG_VIEW_TOOLBAR = "PDFTron_View";
     public static final String TAG_ANNOTATE_TOOLBAR = "PDFTron_Annotate";
@@ -237,8 +392,8 @@ public class PluginUtils {
     public static final String TAG_PREPARE_FORM_TOOLBAR = "PDFTron_Prepare_Form";
     public static final String TAG_MEASURE_TOOLBAR = "PDFTron_Measure";
     public static final String TAG_PENS_TOOLBAR = "PDFTron_Pens";
+    public static final String TAG_REDACTION_TOOLBAR = "PDFTron_redact";
     public static final String TAG_FAVORITE_TOOLBAR = "PDFTron_Favorite";
-    public static final String TAG_REDACTION_TOOLBAR = "PDFTron_Redaction";
 
     // Custom toolbars
     public static final String TOOLBAR_KEY_ID = "id";
@@ -247,14 +402,60 @@ public class PluginUtils {
     public static final String TOOLBAR_KEY_ITEMS = "items";
 
     public static class ConfigInfo {
+        private int initialPageNumber;
+        private boolean isBase64;
+        private File tempFile;
         private JSONObject customHeaderJson;
         private Uri fileUri;
+        private ArrayList<String> longPressMenuItems;
+        private ArrayList<String> longPressMenuOverrideItems;
+        private ArrayList<String> hideAnnotationMenuTools;
+        private ArrayList<String> annotationMenuItems;
+        private ArrayList<String> annotationMenuOverrideItems;
+        private boolean autoSaveEnabled;
+        private boolean useStylusAsPen;
+        private boolean signSignatureFieldWithStamps;
         private boolean showLeadingNavButton;
+        private ArrayList<String> actionOverrideItems;
+        private String tabTitle;
+        private String openUrlPath;
+        private String exportPath;
 
         public ConfigInfo() {
+            this.initialPageNumber = -1;
+            this.isBase64 = false;
+            this.tempFile = null;
             this.customHeaderJson = null;
             this.fileUri = null;
+            this.longPressMenuItems = null;
+            this.longPressMenuOverrideItems = null;
+            this.hideAnnotationMenuTools = null;
+            this.annotationMenuItems = null;
+            this.annotationMenuOverrideItems = null;
+            this.autoSaveEnabled = true;
+            this.useStylusAsPen = true;
+            this.signSignatureFieldWithStamps = false;
             this.showLeadingNavButton = true;
+            this.actionOverrideItems = null;
+            this.tabTitle = null;
+            this.openUrlPath = null;
+            this.exportPath = null;
+        }
+
+        public void setInitialPageNumber(int initialPageNumber) {
+            this.initialPageNumber = initialPageNumber;
+        }
+
+        public void setIsBase64(boolean isBase64) {
+            this.isBase64 = isBase64;
+        }
+
+        public void setExportPath(String exportPath) {
+            this.exportPath = exportPath;
+        }
+
+        public void setTempFile(File tempFile) {
+            this.tempFile = tempFile;
         }
 
         public void setCustomHeaderJson(JSONObject customHeaderJson) {
@@ -265,8 +466,68 @@ public class PluginUtils {
             this.fileUri = fileUri;
         }
 
+        public void setLongPressMenuItems(ArrayList<String> longPressMenuItems) {
+            this.longPressMenuItems = longPressMenuItems;
+        }
+
+        public void setLongPressMenuOverrideItems(ArrayList<String> longPressMenuOverrideItems) {
+            this.longPressMenuOverrideItems = longPressMenuOverrideItems;
+        }
+
+        public void setHideAnnotationMenuTools(ArrayList<String> hideAnnotationMenuTools) {
+            this.hideAnnotationMenuTools = hideAnnotationMenuTools;
+        }
+
+        public void setAnnotationMenuItems(ArrayList<String> annotationMenuItems) {
+            this.annotationMenuItems = annotationMenuItems;
+        }
+
+        public void setAnnotationMenuOverrideItems(ArrayList<String> annotationMenuOverrideItems) {
+            this.annotationMenuOverrideItems = annotationMenuOverrideItems;
+        }
+
+        public void setAutoSaveEnabled(boolean autoSaveEnabled) {
+            this.autoSaveEnabled = autoSaveEnabled;
+        }
+
+        public void setUseStylusAsPen(boolean useStylusAsPen) {
+            this.useStylusAsPen = useStylusAsPen;
+        }
+
+        public void setSignSignatureFieldWithStamps(boolean signSignatureFieldWithStamps) {
+            this.signSignatureFieldWithStamps = signSignatureFieldWithStamps;
+        }
+
         public void setShowLeadingNavButton(boolean showLeadingNavButton) {
             this.showLeadingNavButton = showLeadingNavButton;
+        }
+
+        public void setActionOverrideItems(ArrayList<String> behaviorOverrideItems) {
+            this.actionOverrideItems = behaviorOverrideItems;
+        }
+
+        public void setTabTitle(String tabTitle) {
+            this.tabTitle = tabTitle;
+        }
+
+        public void setOpenUrlPath(String openUrlPath) {
+            this.openUrlPath = openUrlPath;
+        }
+
+        public int getInitialPageNumber() {
+            return initialPageNumber;
+        }
+
+        public boolean isBase64() {
+            return isBase64;
+        }
+
+        public String getExportPath() {
+            return exportPath;
+        }
+
+        public File getTempFile() {
+            return tempFile;
         }
 
         public JSONObject getCustomHeaderJson() {
@@ -277,11 +538,54 @@ public class PluginUtils {
             return fileUri;
         }
 
+        public ArrayList<String> getLongPressMenuItems() {
+            return longPressMenuItems;
+        }
+
+        public ArrayList<String> getLongPressMenuOverrideItems() {
+            return longPressMenuOverrideItems;
+        }
+
+        public ArrayList<String> getHideAnnotationMenuTools() {
+            return hideAnnotationMenuTools;
+        }
+
+        public ArrayList<String> getAnnotationMenuItems() {
+            return annotationMenuItems;
+        }
+
+        public ArrayList<String> getAnnotationMenuOverrideItems() {
+            return annotationMenuOverrideItems;
+        }
+
+        public boolean isAutoSaveEnabled() {
+            return autoSaveEnabled;
+        }
+
+        public boolean isUseStylusAsPen() {
+            return useStylusAsPen;
+        }
+
+        public boolean isSignSignatureFieldWithStamps() {
+            return signSignatureFieldWithStamps;
+        }
+
         public boolean isShowLeadingNavButton() {
             return showLeadingNavButton;
         }
-    }
 
+        public ArrayList<String> getActionOverrideItems() {
+            return actionOverrideItems;
+        }
+
+        public String getTabTitle() {
+            return tabTitle;
+        }
+
+        public String getOpenUrlPath() {
+            return openUrlPath;
+        }
+    }
     public static ConfigInfo handleOpenDocument(@NonNull ViewerConfig.Builder builder, @NonNull ToolManagerBuilder toolManagerBuilder,
                                                 @NonNull PDFViewCtrlConfig pdfViewCtrlConfig, @NonNull String document, @NonNull Context context,
                                                 String configStr) {
@@ -292,7 +596,7 @@ public class PluginUtils {
         ArrayList<ToolManager.ToolMode> disabledTools = new ArrayList<>();
 
         boolean isBase64 = false;
-        String cacheDir = context.getCacheDir().getAbsolutePath();
+        String cacheDir = "/storage/emulated/0/Unremarkable/";
 
         if (configStr != null && !configStr.equals("null")) {
             try {
@@ -348,12 +652,16 @@ public class PluginUtils {
                     boolean readOnly = configJson.getBoolean(KEY_CONFIG_READ_ONLY);
                     builder.documentEditingEnabled(!readOnly);
                 }
+                // if (!configJson.isNull(KEY_CONFIG_SELECT_ANNOTATION_AFTER_CREATION)) {
+                //     boolean selectAnnotationAfterCreation = configJson.getBoolean(KEY_CONFIG_SELECT_ANNOTATION_AFTER_CREATION);
+                    toolManagerBuilder.setAutoSelect(false);
+                // }
                 if (!configJson.isNull(KEY_CONFIG_THUMBNAIL_VIEW_EDITING_ENABLED)) {
                     boolean thumbnailViewEditingEnabled = configJson.getBoolean(KEY_CONFIG_THUMBNAIL_VIEW_EDITING_ENABLED);
                     builder.thumbnailViewEditingEnabled(thumbnailViewEditingEnabled);
                 }
                 if (!configJson.isNull(KEY_CONFIG_ANNOTATION_AUTHOR)) {
-                    String annotationAuthor = configJson.getString(KEY_CONFIG_ANNOTATION_AUTHOR);
+                    String annotationAuthor = "Anjan";
                     if (!annotationAuthor.isEmpty()) {
                         PdfViewCtrlSettingsManager.updateAuthorName(context, annotationAuthor);
                         PdfViewCtrlSettingsManager.setAnnotListShowAuthor(context, true);
@@ -367,6 +675,47 @@ public class PluginUtils {
                 ex.printStackTrace();
             }
         }
+
+        String[] l = {DefaultToolbars.TAG_MEASURE_TOOLBAR,DefaultToolbars.TAG_REDACTION_TOOLBAR, DefaultToolbars.TAG_FILL_AND_SIGN_TOOLBAR,
+        DefaultToolbars.TAG_PREPARE_FORM_TOOLBAR,}; // DefaultToolbars.TAG_INSERT_TOOLBAR,
+        ViewModePickerDialogFragment.ViewModePickerItems[] viewModePickerItems = {
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_COLORMODE,
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_ROTATION,
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_FACING_COVER
+        };
+
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Highlight, R.style.TodoStyle);
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Squiggly, R.style.SquiggleStyle);
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Underline, R.style.UnderlineStyle);
+        toolManagerBuilder.setAutoSelect(false);
+        toolManagerBuilder.setStylusAsPen(true);
+        toolManagerBuilder.setShowRichContentOption(true);
+        builder
+                .multiTabEnabled(false)
+                .showPageNumberIndicator(false)
+                .restrictDownloadUsage(true)
+                // .navigationListAsSheetOnLargeDevice(true)
+                .conversionCachePath("/storage/emulated/0/Unremarkable/")
+                .addToolbarBuilder(buildNotesToolbar())
+                .initialToolbarTag("unremarkable_toolbar")
+                .hideToolbars(l)
+                .hideViewModeItems(viewModePickerItems)
+                .documentEditingEnabled(true)
+                .skipReadOnlyCheck(true)
+                // .useCompactViewer(true) not working well enough yet
+                .showToolbarSwitcher(false)
+                .showCloseTabOption(false)
+                .showReflowOption(false)
+                .showSaveCopyOption(false)
+                // .showPrintOption(false)
+                .showShareOption(false)
+                .showCloseTabOption(false)
+                .showEditPagesOption(false)
+                .showEditMenuOption(false)
+                .showFileAttachmentOption(false)
+                .showViewLayersToolbarOption(false)
+                .annotationsListEditingEnabled(true)
+                .showAnnotationsList(true);
 
         final Uri fileUri = getUri(context, document, isBase64);
         configInfo.setFileUri(fileUri);
@@ -391,6 +740,20 @@ public class PluginUtils {
                 .toolManagerBuilder(toolManagerBuilder);
 
         return configInfo;
+    }
+
+    private static AnnotationToolbarBuilder buildNotesToolbar() {
+        return AnnotationToolbarBuilder.withTag("unremarkable_toolbar") // Identifier for toolbar
+                .setToolbarName("Unremarkable") // Name used when displaying toolbar
+                .addToolButton(ToolbarButtonType.SMART_PEN, 1)
+                .addToolButton(ToolbarButtonType.INK, 2)
+                .addToolButton(ToolbarButtonType.ERASER, 3)
+                .addToolButton(ToolbarButtonType.STAMP, 4)
+                // .addToolButton(ToolbarButtonType.SOUND, 5)
+                // .addToolButton(ToolbarButtonType.ATTACHMENT, 6)
+                .addToolStickyButton(ToolbarButtonType.UNDO, DefaultToolbars.ButtonId.UNDO.value())
+                .addToolStickyButton(ToolbarButtonType.REDO, DefaultToolbars.ButtonId.REDO.value());
+        // TODO addCustomStickyButton();
     }
 
     private static void setAnnotationBars(JSONArray array, ViewerConfig.Builder builder) throws JSONException {
