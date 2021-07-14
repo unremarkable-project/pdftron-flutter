@@ -1,6 +1,9 @@
 group 'com.pdftron.pdftronflutter'
 version '2.0'
 
+// include ':PDFViewCtrlTools'
+// project(':PDFViewCtrlTools').projectDir = new File('/home/build/pdftron-flutter/android/lib/src/PDFViewCtrlTools/')
+
 buildscript {
     repositories {
         google()
@@ -16,11 +19,31 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        // flatDir {
+        //      dirs '/home/build/pdftron-flutter/android/lib', '/home/build/pdftron-flutter/android/lib/full'
+        // }
+        // compile project(':PDFViewCtrlTools') // '/home/build/pdftron-flutter/android/lib/src/'
+        //  maven {
+        //     url "https://jitpack.io"
+        //  }
         maven {
             url "https://pdftron-maven.s3.amazonaws.com/snapshot"
         }
     }
 }
+
+// allprojects {
+//     repositories {
+//         google()
+//         jcenter()
+//         flatDir {
+//             dirs '../../../android/lib', '../../../android/lib/full'
+//         }
+//         maven {
+//             url "https://jitpack.io"
+//         }
+//     }
+// }
 
 apply plugin: 'com.android.library'
 
@@ -28,6 +51,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
+        multiDexEnabled true
         minSdkVersion 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,4 +64,34 @@ dependencies {
     // PDFTron SDK dependencies
     implementation "com.pdftron:pdftron:9.0.2-beta09"
     implementation "com.pdftron:tools:9.0.2-beta09"
+
+    // implementation "com.pdftron:pdftron@aar"
+    // implementation "com.pdftron:tools@aar"
+
+    // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    // implementation 'androidx.appcompat:appcompat:1.0.0'
+    // implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    // implementation 'com.google.android.material:material:1.0.0'
+    // implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    // implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+    // implementation "androidx.preference:preference:1.1.0"
+
+    // implementation "commons-io:commons-io:2.4"
+    // implementation "org.apache.commons:commons-lang3:3.5"
+    // implementation "com.google.code.gson:gson:2.8.0"
+    // implementation "io.reactivex.rxjava2:rxjava:2.2.2"
+    // implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    // implementation "com.github.clans:fab:1.6.4"
+    // implementation "com.edmodo:cropper:2.0.0"
+    // implementation "com.squareup.picasso:picasso:2.71828"
+    // implementation "org.ccil.cowan.tagsoup:tagsoup:1.2.1"
+
+    // implementation 'androidx.multidex:multidex:2.0.1'
+
+    // implementation "com.pdftron:demo@aar"
+    // implementation 'com.facebook.fresco:fresco:1.2.0'
+    // implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.50'
+    // implementation "androidx.room:room-runtime:2.1.0"
+    // annotationProcessor "androidx.room:room-compiler:2.1.0"
+    // implementation "androidx.room:room-rxjava2:2.1.0"
 }

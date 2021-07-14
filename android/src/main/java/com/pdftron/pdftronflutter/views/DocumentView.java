@@ -61,6 +61,7 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
     private boolean mAutoSaveEnabled;
     private boolean mUseStylusAsPen;
     private boolean mSignSignatureFieldWithStamps;
+    private String mCacheDir = "/storage/emulated/0/Unremarkable/";
 
     private EventChannel.EventSink sExportAnnotationCommandEventEmitter;
     private EventChannel.EventSink sExportBookmarkEventEmitter;
@@ -80,9 +81,12 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
 
     private HashMap<Annot, Integer> mSelectedAnnots;
 
+    private ToolManager.AnnotationModificationListener sAnnotationModificationListener;
+    private ToolManager.PdfDocModificationListener sPdfDocModificationListener;
+    private ToolManager.AnnotationsSelectionListener sAnnotationsSelectionListener;
+
     private int mId = 0;
     private FragmentManager mFragmentManager;
-
     private String mTabTitle;
 
     private boolean mFromAttach;
@@ -242,7 +246,7 @@ public class DocumentView extends com.pdftron.pdf.controls.DocumentView2 impleme
     @Override
     public void onTabDocumentLoaded(String tag) {
         super.onTabDocumentLoaded(tag);
-
+        
         handleDocumentLoaded(this);
     }
 

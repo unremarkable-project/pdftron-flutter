@@ -30,8 +30,7 @@ class AnnotWithRect {
   AnnotWithRect(this.id, this.pageNumber, this.rect);
 
   factory AnnotWithRect.fromJson(dynamic json) {
-    return AnnotWithRect(
-        json['id'], json['pageNumber'], Rect.fromJson(json['rect']));
+    return AnnotWithRect(json['id'], json['pageNumber'], Rect.fromJson(json['rect']));
   }
 }
 
@@ -47,8 +46,7 @@ class Field {
     return Field(json['fieldName'], (json['fieldValue']));
   }
 
-  Map<String, dynamic> toJson() =>
-      {'fieldName': fieldName, 'fieldValue': fieldValue};
+  Map<String, dynamic> toJson() => {'fieldName': fieldName, 'fieldValue': fieldValue};
 }
 
 class Rect {
@@ -58,24 +56,18 @@ class Rect {
   double? x1, y1, x2, y2, width, height;
   Rect(this.x1, this.y1, this.x2, this.y2, this.width, this.height);
 
-  Rect.fromCoordinates(this.x1, this.y1, this.x2, this.y2) { 
+  Rect.fromCoordinates(this.x1, this.y1, this.x2, this.y2) {
     if (x1 != null && x2 != null) {
       width = (x2 as double) - (x1 as double);
     }
-    
+
     if (y1 != null && y2 != null) {
       height = (y2 as double) - (y1 as double);
     }
   }
 
   factory Rect.fromJson(dynamic json) {
-    return Rect(
-        getDouble(json['x1']),
-        getDouble(json['y1']),
-        getDouble(json['x2']),
-        getDouble(json['y2']),
-        getDouble(json['width']),
-        getDouble(json['height']));
+    return Rect(getDouble(json['x1']), getDouble(json['y1']), getDouble(json['x2']), getDouble(json['y2']), getDouble(json['width']), getDouble(json['height']));
   }
 
   // a helper for JSON number decoding
@@ -128,8 +120,7 @@ class AnnotWithFlag {
     flags.add(new AnnotFlag(flag, flagValue));
   }
 
-  Map<String, dynamic> toJson() =>
-      {'annotation': jsonEncode(annotation), 'flags': jsonEncode(flags)};
+  Map<String, dynamic> toJson() => {'annotation': jsonEncode(annotation), 'flags': jsonEncode(flags)};
 }
 
 class AnnotProperty {
@@ -173,6 +164,29 @@ class CustomToolbar {
 
   CustomToolbar(this.id, this.name, this.items, [this.icon]);
 
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'name': name, 'items': jsonEncode(items), 'icon': icon};
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'items': jsonEncode(items), 'icon': icon};
+}
+
+class DefaultToolbars {
+  static const view = "PDFTron_View";
+  static const annotate = "PDFTron_Annotate";
+  static const draw = "PDFTron_Draw";
+  static const insert = "PDFTron_Insert";
+  static const fillAndSign = "PDFTron_Fill_and_Sign";
+  static const prepareForm = "PDFTron_Prepare_Form";
+  static const measure = "PDFTron_Measure";
+  static const pens = "PDFTron_Pens";
+  static const favorite = "PDFTron_Favorite";
+}
+
+class ToolbarIcons {
+  static const view = "PDFTron_View";
+  static const annotate = "PDFTron_Annotate";
+  static const draw = "PDFTron_Draw";
+  static const insert = "PDFTron_Insert";
+  static const fillAndSign = "PDFTron_Fill_and_Sign";
+  static const prepareForm = "PDFTron_Prepare_Form";
+  static const measure = "PDFTron_Measure";
+  static const pens = "PDFTron_Pens";
+  static const favorite = "PDFTron_Favorite";
 }

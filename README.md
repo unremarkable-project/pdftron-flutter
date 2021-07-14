@@ -313,6 +313,206 @@ class _ViewerState extends State<Viewer> {
       ),
     );
   }
+}
+```
+
+## APIs
+
+### PdftronFlutter.version
+
+Obtain PDFTron SDK version
+
+**Returns:** String
+
+### PdftronFlutter.initialize(String)
+
+Initializes PDFTron SDK
+
+#### Params
+
+##### key
+Your PDFTron license key
+
+Type | Required | Default
+--- | --- | ---
+String | true | 
+
+### PdftronFlutter.openDocument(String)
+
+Opens a document in the viewer
+
+#### Params
+
+##### path
+Path to the document
+
+Type | Required | Default
+--- | --- | ---
+String | true | 
+
+### PdftronFlutter.openDocument(String, password: String, config: Config)
+
+Opens a document in the viewer with options to remove buttons and disable tools
+
+Optional parameters:
+- `password`: String, password to an encrypted document
+- `config`: Config, viewer configuration options
+
+configs (more info could be found in `lib/config.dart`):
+
+Name | Type | Default | Explanation
+-- | -- | -- | -- | 
+disabledElements | array of `Buttons` constants | empty | Buttons to be disabled for the viewer
+disabledTools | array of `Tools` constants | empty | Tools to be disabled for the viewer
+multiTabEnabled | boolean | false | enable document multi-tab mode
+customerHeaders | map<string, string> | empty | custom headers to use with HTTP/HTTPS requests
+annotationToolbars | array of `CustomToolbar` objects or `DefaultToolbars` constants| | Defines custom toolbars. If passed in, default toolbars will no longer appear.
+hideDefaultAnnotationToolbars | array of `DefaultToolbars` objects| empty | Defines which default toolbars should be hidden
+hideAnnotationToolbarSwitcher | boolean | false | Defines whether to show the toolbar switcher in the top toolbar
+hideTopToolbars | boolean | false | Defines whether to show both the top nav app bar and the annotation toolbar
+hideTopAppNavBar | boolean | false | Defines whether to show the top nav app bar
+showLeadingNavButton | boolean | true | Whether to show the leading navigation button
+readOnly | boolean | false | whether the document is read-only
+thumbnailViewEditingEnabled | boolean | true | whether use could modify through thumbnail view
+annotationAuthor | string | | the author name for all annotations in the current document
+continuousAnnotationEditing | boolean | false | whether annotations could be continuously edited
+
+```dart
+var disabledElements = [Buttons.shareButton, Buttons.searchButton];
+var disabledTools = [Tools.annotationCreateLine, Tools.annotationCreateRectangle];
+var customToolbar = new CustomToolbar('myToolbar', 'myToolbar', [Tools.annotationCreateArrow, Tools.annotationCreateCallout], ToolbarIcons.favorite);
+var annotationToolbars = [DefaultToolbars.annotate, customToolbar];
+// var hideDefaultAnnotationToolbars = [DefaultToolbars.annotate, DefaultToolbars.draw];
+
+var config = Config();
+config.disabledElements = disabledElements;
+config.disabledTools = disabledTools;
+config.multiTabEnabled = false;
+config.customHeaders = {'headerName': 'headerValue'};
+config.annotationToolbars = annotationToolbars;
+// config.hideDefaultAnnotationToolbars = hideDefaultAnnotationToolbars;
+config.hideAnnotationToolbarSwitcher = false;
+config.hideTopToolbars = false;
+config.hideTopAppNavBar = false;
+config.showLeadingNavButton = true;
+config.readOnly = false;
+config.thumbnailViewEditingEnabled = false;
+config.annotationAuthor = "PDFTron";
+config.continuousAnnotationEditing = true;
+await PdftronFlutter.openDocument(_document, config: config);
+```
+### PdftronFlutter.importAnnotations(String)
+Imports XFDF string to current document.
+
+```dart
+
+var xfdf = '<?xml version="1.0" encoding="UTF-8"?>\n<xfdf xmlns="http://ns.adobe.com/xfdf/" xml:space="preserve">\n\t<annots>\n\t\t<circle style="solid" width="5" color="#E44234" opacity="1" creationdate="D:20190729202215Z" flags="print" date="D:20190729202215Z" page="0" rect="138.824,653.226,236.28,725.159" title="" /></annots>\n\t<pages>\n\t\t<defmtx matrix="1.333333,0.000000,0.000000,-1.333333,0.000000,1056.000000" />\n\t</pages>\n\t<pdf-info version="2" xmlns="http://www.pdftron.com/pdfinfo" />\n</xfdf>';
+PdftronFlutter.importAnnotations(xfdf);
+```
+
+### PdftronFlutter.exportAnnotations(List<`Annot`>)
+To extract XFDF from the current document. If `annotationList` is null, export all annotations from the document; Else export the valid ones specified.
+
+For more details about `Annot`, please check `lib/options.dart` file.
+
+Params:
+Name | Type | Description
+--- | --- | ---
+annotationList | List<`Annot`> | A list of `Annot`, nullable
+
+Export all annotations:
+```dart
+var xfdf = await PdftronFlutter.exportAnnotations(null);
+```
+
+Export specified annotations:
+```dart
+List<Annot> annotList = new List<Annot>();
+list.add(new Annot('Hello', 1));
+list.add(new Annot('World', 2));
+var xfdf = await PdftronFlutter.exportAnnotations(annotList);
+```
+
+### PdftronFlutter.flattenAnnotations(bool)
+To flatten the forms and (optionally) annotations in the current document.
+
+Params:
+Name | Type | Description
+--- | --- | ---
+formsOnly | bool | whether only forms are flattened
+
+Flatten only forms:
+```dart
+PdftronFlutter.flattenAnnotations(true);
+```
+
+Flatten forms and annotations:
+```dart
+PdftronFlutter.flattenAnnotations(false);
+```
+
+### PdftronFlutter.deleteAnnotations(List<`Annot`>)
+To delete the specified annotations in the current document.
+
+For more details about `Annot`, please check `lib/options.dart` file.
+
+Params:
+Name | Type | Description
+--- | --- | ---
+annotationList | List<`Annot`> | A list of `Annot`
+
+```dart
+List<Annot> annotList = new List<Annot>();
+list.add(new Annot('Hello', 1));
+list.add(new Annot('World', 2));
+PdftronFlutter.deleteAnnotations(annotList);
+```
+
+### PdftronFlutter.selectAnnotation(Annot)
+Select the specified annotation in the current document.
+
+For more details about `Annot`, please check `lib/options.dart` file.
+
+Params:
+Name | Type | Description
+--- | --- | ---
+annotation | Annot | the annotation to be selected
+
+```dart
+PdftronFlutter.selectAnnotation(new Annot('Hello', 1));
+```
+
+### PdftronFlutter.setFlagsForAnnotations(List<`AnnotWithFlags`>)
+To set flags for specified annotations in the current document.
+
+For more details about `Annot`, `AnnotFlag` and `AnnotWithFlags`, please check `lib/options.dart` file.
+
+Params:
+Name | Type | Description
+--- | --- | ---
+annotationWithFlagsList | List<`AnnotWithFlags`> | a list of annotations with respective flags to be set
+
+```dart
+List<AnnotWithFlags> annotsWithFlags = new List<AnnotWithFlags>();
+
+Annot hello = new Annot('Hello', 1);
+Annot world = new Annot('World', 3);
+AnnotFlag printOn = new AnnotFlag(AnnotationFlags.print, true);
+AnnotFlag unlock = new AnnotFlag(AnnotationFlags.locked, false);
+
+// you can add an AnnotWithFlags object flexibly like this:
+list.add(new AnnotWithFlags.fromAnnotAndFlags(hello, [printOn, unlock]));
+list.add(new AnnotWithFlags.fromAnnotAndFlags(world, [unlock]));
+
+// Or simply use the constructor like this:
+list.add(new AnnotWithFlags('Pdftron', 10, AnnotationFlags.no_zoom, true));
+PdftronFlutter.setFlagsForAnnotations(annotsWithFlags);
+```
+
+### PdftronFlutter.importAnnotationCommand(String)
+
+Imports XFDF command string to the document.
+The XFDF needs to be a valid command format with `<add>` `<modify>` `<delete>` tags.
 
   void _onDocumentViewCreated(DocumentViewController controller) async {
     Config config = new Config();

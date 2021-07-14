@@ -1,34 +1,56 @@
 package com.pdftron.pdftronflutter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.LongSparseArray;
+import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.pdftron.common.PDFNetException;
+import com.pdftron.pdf.Action;
 import com.pdftron.pdf.Annot;
 import com.pdftron.pdf.PDFDoc;
 import com.pdftron.pdf.PDFViewCtrl;
+import com.pdftron.pdf.annots.Link;
 import com.pdftron.pdf.config.PDFViewCtrlConfig;
 import com.pdftron.pdf.config.ToolManagerBuilder;
 import com.pdftron.pdf.config.ViewerBuilder2;
 import com.pdftron.pdf.config.ViewerConfig;
+import com.pdftron.pdf.config.ToolStyleConfig;
+import com.pdftron.pdf.dialog.ViewModePickerDialogFragment;
 import com.pdftron.pdf.controls.DocumentActivity;
 import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
 import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
+import com.pdftron.pdf.model.AnnotStyle;
+import com.pdftron.pdf.tools.CustomRelativeLayout;
+import com.pdftron.pdf.tools.Tool;
 import com.pdftron.pdf.tools.ToolManager;
+import com.pdftron.pdf.utils.CommonToast;
 import com.pdftron.pdf.utils.Utils;
+import com.pdftron.pdf.utils.PdfViewCtrlSettingsManager;
+import com.pdftron.pdf.widget.toolbar.builder.AnnotationToolbarBuilder;
+import com.pdftron.pdf.widget.toolbar.builder.ToolbarButtonType;
+import com.pdftron.pdftronflutter.helpers.CustomAnnotationToolbar;
+import com.pdftron.pdftronflutter.helpers.CustomizationDelegate;
 import com.pdftron.pdftronflutter.helpers.PluginUtils;
 import com.pdftron.pdftronflutter.helpers.ViewerComponent;
 import com.pdftron.pdftronflutter.helpers.ViewerImpl;
+import com.pdftron.pdf.widget.toolbar.component.DefaultToolbars;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import io.flutter.plugin.common.EventChannel.EventSink;
@@ -77,10 +99,10 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     private static HashMap<Annot, Integer> mSelectedAnnots;
 
     public static void openDocument(Context packageContext, String document, String password, String configStr) {
-
         ViewerConfig.Builder builder = new ViewerConfig.Builder();
-
         ToolManagerBuilder toolManagerBuilder = ToolManagerBuilder.from();
+        toolManagerBuilder.setShowRichContentOption(true);
+        toolManagerBuilder.setStylusAsPen(true);
         PDFViewCtrlConfig pdfViewCtrlConfig = PDFViewCtrlConfig.getDefaultConfig(packageContext);
         PluginUtils.ConfigInfo configInfo = PluginUtils.handleOpenDocument(builder, toolManagerBuilder, pdfViewCtrlConfig, document, packageContext, configStr);
 
@@ -101,11 +123,11 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         mShowLeadingNavButton = configInfo.isShowLeadingNavButton();
         mActionOverrideItems = configInfo.getActionOverrideItems();
 
-        if (mShowLeadingNavButton) {
+         if (mShowLeadingNavButton) {
             openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build());
-        } else {
+         } else {
             openDocument(packageContext, configInfo.getFileUri(), password, configInfo.getCustomHeaderJson(), builder.build(), 0);
-        }
+         }
     }
 
     public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, ViewerConfig config) {
@@ -137,12 +159,53 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
                 intentBuilder.usingCustomHeaders(customHeaders);
             }
 
+            SharedPreferences settings = Tool.getToolPreferences(packageContext);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt(ToolStyleConfig.getInstance().getTextMarkupTypeKey(AnnotStyle.CUSTOM_SMART_PEN, ""), Annot.e_Underline);
+            editor.apply();
+            // default stylus breaks hiding and showing toolbar for some reason
+            PdfViewCtrlSettingsManager.setDefaultStylusToolMode(packageContext, ToolManager.ToolMode.SMART_PEN_INK);
             intentBuilder.usingNavIcon(navIconId);
             intentBuilder.usingConfig(config);
             intentBuilder.usingNewUi(true);
             packageContext.startActivity(intentBuilder.build());
         }
     }
+
+    static AnnotationToolbarBuilder buildNotesToolbar() {
+        return AnnotationToolbarBuilder.withTag("unremarkable_toolbar") // Identifier for toolbar
+                .setToolbarName("Unremarkable") // Name used when displaying toolbar
+                .addToolButton(ToolbarButtonType.SMART_PEN, 1)
+                .addToolButton(ToolbarButtonType.INK, 2)
+                .addToolButton(ToolbarButtonType.STAMP, 3)
+                // .addToolButton(ToolbarButtonType.STICKY_NOTE, 4)
+                // .addToolButton(ToolbarButtonType.SOUND, 5)
+                // .addToolButton(ToolbarButtonType.ATTACHMENT, 6)
+                .addToolStickyButton(ToolbarButtonType.UNDO, DefaultToolbars.ButtonId.UNDO.value())
+                .addToolStickyButton(ToolbarButtonType.REDO, DefaultToolbars.ButtonId.REDO.value());
+        // TODO addCustomStickyButton();
+    }
+
+
+    // public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config) {
+    //     openDocument(packageContext, fileUri, password, customHeaders, config, DEFAULT_NAV_ICON_ID);
+    // }
+
+    // public static void openDocument(Context packageContext, Uri fileUri, String password, @Nullable JSONObject customHeaders, @Nullable ViewerConfig config, @DrawableRes int navIconId) {
+    //     DocumentActivity.IntentBuilder intentBuilder = DocumentActivity.IntentBuilder.fromActivityClass(packageContext, FlutterDocumentActivity.class);
+
+    //     if (null != fileUri) {
+    //         intentBuilder.withUri(fileUri);
+    //     }
+
+    //     if (null != password) {
+    //         intentBuilder.usingPassword(password);
+    //     }
+
+    //     if (null != customHeaders) {
+    //         intentBuilder.usingCustomHeaders(customHeaders);
+    //     }
+    // }
 
     public int getInitialPageNumber() {
         return mInitialPageNumber;
@@ -336,7 +399,12 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Uri uri = getIntent().getData();
+        // if(uri != null) openDocument(getApplicationContext(),uri.toString(),"","");
         super.onCreate(savedInstanceState);
+
+        new CustomLinkClick(FlutterDocumentActivity.this, mPdfViewCtrlTabHostFragment2);
+        // PdfViewCtrlTabFragment2.
 
         attachActivity();
     }
@@ -368,6 +436,18 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         super.onTabDocumentLoaded(tag);
 
         PluginUtils.handleDocumentLoaded(this);
+        if(mPdfViewCtrlTabHostFragment2 != null) {
+            PDFViewCtrl ctrl = getPdfViewCtrl();
+            if(ctrl != null) { 
+                ctrl.setPageSpacingDP(0,0,0,0);
+                // ctrl.set
+                ctrl.setProgressiveRendering(true);
+            }
+            // mPdfViewCtrlTabHostFragment2.openToolbarWithTag("view_toolbar");
+            // mPdfViewCtrlTabHostFragment2.selectToolbarButton(DefaultToolbars.ButtonId.SMART_PEN);
+        }
+    //    new CustomAnnotationToolbar(FlutterDocumentActivity.this, mPdfViewCtrlTabHostFragment2);
+
     }
 
     @Override
@@ -391,9 +471,8 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
 
     @Override
     public void onNavButtonPressed() {
-        handleLeadingNavButtonPressed(this);
-
-        super.onNavButtonPressed();
+        // handleLeadingNavButtonPressed(this);
+        finish();
     }
 
     private void attachActivity() {
@@ -422,6 +501,9 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
         }
         return null;
     }
+    // when you get the view controller fragment apply the default segments override here. 
+    // we need the basic colors from the xml may be able to call them with the 
+    // proper R.id callsign if possible
 
     @Nullable
     public PDFViewCtrl getPdfViewCtrl() {
@@ -451,5 +533,107 @@ public class FlutterDocumentActivity extends DocumentActivity implements ViewerC
     @Override
     public ViewerImpl getImpl() {
         return mImpl;
+    }
+    class CustomLinkClick extends CustomizationDelegate {
+        private LongSparseArray<CustomRelativeLayout> mLinkOverlayMap = new LongSparseArray<>();
+
+        public CustomLinkClick(@NonNull Context context, @NonNull PdfViewCtrlTabHostFragment2 tabHostFragment) {
+            super(context, tabHostFragment);
+        }
+
+        @Override
+        public void applyCustomization(@NonNull PdfViewCtrlTabFragment2 tabFragment) {
+            customizeLinkClick(mContext, tabFragment, mLinkOverlayMap);
+        }
+
+        private void customizeLinkClick(@NonNull final Context context,
+                                        @NonNull final PdfViewCtrlTabFragment2 tabFragment,
+                                        @NonNull final LongSparseArray<CustomRelativeLayout> mLinkOverlayMap) {
+
+            final PDFViewCtrl pdfViewCtrl = tabFragment.getPDFViewCtrl();
+            final ToolManager toolManager = tabFragment.getToolManager();
+
+            if (pdfViewCtrl != null && toolManager != null) {
+                toolManager.setBasicAnnotationListener(new ToolManager.BasicAnnotationListener() {
+                    @Override
+                    public void onAnnotationSelected(Annot annot, int i) {
+                        tabFragment.onAnnotationSelected(annot, i);
+                    }
+
+                    @Override
+                    public void onAnnotationUnselected() {
+                        tabFragment.onAnnotationUnselected();
+                    }
+
+                    @Override
+                    public boolean onInterceptAnnotationHandling(@Nullable Annot annot, Bundle bundle, ToolManager.ToolMode toolMode) {
+                        // custom link behaviour
+                        // instead of jumping to the destination, let's display a flashing view on top of the link
+                        try { // TODO checking for other annotations and respond here
+                            if (annot != null && annot.isValid() && annot.getType() == Annot.e_Link) {
+                                int pageNum = bundle.getInt(Tool.PAGE_NUMBER);
+
+                                
+                                addCustomViewOnLink(context, mLinkOverlayMap, pdfViewCtrl, annot, pageNum);
+
+                                Link link = new Link(annot);
+                                Action action = link.getAction();
+                                if (action != null && action.isValid()) {
+                                    if (action.getType() == Action.e_URI) {
+                                        String uri = action.getSDFObj().get("URI").value().getAsPDFText();
+                                        Intent web = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                                        startActivity(web);
+                                        // Use Uri here.....
+                                        // Toast.makeText(context, uri,Toast.LENGTH_SHORT);
+                                    }
+                                }
+
+                                toolManager.setTool(toolManager.createTool(ToolManager.ToolMode.PAN, null));
+                                pdfViewCtrl.invalidate();
+                                return true;
+                            } else if(annot != null && annot.isValid() && annot.getType() == Annot.e_Ink) {
+                                
+                                pdfViewCtrl.invalidate();
+                                return true;
+                            } 
+                            // else if(annot != null && annot.isValid() && annot.getType() == Annot.e_Highlight) {
+                            // }
+                        } catch (PDFNetException e) {
+                            e.printStackTrace();
+                        }
+
+                        return tabFragment.onInterceptAnnotationHandling(annot, bundle, toolMode);
+                    }
+
+                    @Override
+                    public boolean onInterceptDialog(AlertDialog alertDialog) {
+                        return tabFragment.onInterceptDialog(alertDialog);
+                    }
+                });
+            }
+        }
+
+        public void addCustomViewOnLink(@NonNull Context context,
+                                        @NonNull LongSparseArray<CustomRelativeLayout> linkedOverlayMap,
+                                        @NonNull PDFViewCtrl pdfViewCtrl,
+                                        @NonNull Annot annot,
+                                        int pageNum) {
+            try {
+                long annotObjNum = annot.getSDFObj().getObjNum();
+                if (linkedOverlayMap.get(annotObjNum) != null) {
+                    // already added
+                    return;
+                }
+                // CommonToast.showText(context,"Added to queue");
+//                CustomRelativeLayout overlay = new CustomRelativeLayout(context);
+//                overlay.setBackgroundColor(context.getResources().getColor(R.color.dark_gray));
+//                overlay.setAnnot(pdfViewCtrl, annot, pageNum);
+//                overlay.setZoomWithParent(true);
+//                pdfViewCtrl.addView(overlay);
+//                linkedOverlayMap.put(annotObjNum, overlay);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

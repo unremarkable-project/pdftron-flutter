@@ -363,8 +363,6 @@ typedef enum {
 
 - (void)topLeftButtonPressed:(UIBarButtonItem *)barButtonItem;
 
-- (void)topLeftButtonPressed:(UIBarButtonItem *)barButtonItem;
-
 - (UIView*)view;
 
 + (PTDocumentController *)PT_getSelectedDocumentController:(PTTabbedDocumentViewController *)tabbedDocumentViewController;

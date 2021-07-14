@@ -69,15 +69,13 @@ class Config {
 
   set longPressMenuItems(List value) => _longPressMenuItems = value;
 
-  set overrideLongPressMenuBehavior(List value) =>
-      _overrideLongPressMenuBehavior = value;
+  set overrideLongPressMenuBehavior(List value) => _overrideLongPressMenuBehavior = value;
 
   set hideAnnotationMenu(List value) => _hideAnnotationMenu = value;
 
   set annotationMenuItems(List value) => _annotationMenuItems = value;
 
-  set overrideAnnotationMenuBehavior(List value) =>
-      _overrideAnnotationMenuBehavior = value;
+  set overrideAnnotationMenuBehavior(List value) => _overrideAnnotationMenuBehavior = value;
 
   set exportPath(String value) => _exportPath = value;
 
@@ -91,11 +89,9 @@ class Config {
 
   set useStylusAsPen(bool value) => _useStylusAsPen;
 
-  set signSignatureFieldWithStamps(bool value) =>
-      _signSignatureFieldWithStamps = value;
+  set signSignatureFieldWithStamps(bool value) => _signSignatureFieldWithStamps = value;
 
-  set selectAnnotationAfterCreation(bool value) =>
-      _selectAnnotationAfterCreation = value;
+  set selectAnnotationAfterCreation(bool value) => _selectAnnotationAfterCreation = value;
 
   set pageIndicatorEnabled(bool value) => _pageIndicatorEnabled = value;
 
@@ -103,11 +99,9 @@ class Config {
 
   set annotationToolbars(List value) => _annotationToolbars = value;
 
-  set hideDefaultAnnotationToolbars(List value) =>
-      _hideDefaultAnnotationToolbars = value;
+  set hideDefaultAnnotationToolbars(List value) => _hideDefaultAnnotationToolbars = value;
 
-  set hideAnnotationToolbarSwitcher(bool value) =>
-      _hideAnnotationToolbarSwitcher = value;
+  set hideAnnotationToolbarSwitcher(bool value) => _hideAnnotationToolbarSwitcher = value;
 
   set hideTopToolbars(bool value) => _hideTopToolbars = value;
 
@@ -119,23 +113,19 @@ class Config {
 
   set readOnly(bool value) => _readOnly = value;
 
-  set thumbnailViewEditingEnabled(bool value) =>
-      _thumbnailViewEditingEnabled = value;
+  set thumbnailViewEditingEnabled(bool value) => _thumbnailViewEditingEnabled = value;
 
   set annotationAuthor(String value) => _annotationAuthor = value;
 
-  set continuousAnnotationEditing(bool value) =>
-      _continuousAnnotationEditing = value;
+  set continuousAnnotationEditing(bool value) => _continuousAnnotationEditing = value;
 
-  set annotationPermissionCheckEnabled(bool value) =>
-      _annotationPermissionCheckEnabled = value;
+  set annotationPermissionCheckEnabled(bool value) => _annotationPermissionCheckEnabled = value;
 
   set overrideBehavior(List<String> value) => _overrideBehavior = value;
 
   set tabTitle(String value) => _tabTitle = value;
 
-  set pageNumberIndicatorAlwaysVisible(bool value) =>
-      _pageNumberIndicatorAlwaysVisible = value;
+  set pageNumberIndicatorAlwaysVisible(bool value) => _pageNumberIndicatorAlwaysVisible = value;
 
   Config.fromJson(Map<String, dynamic> json)
       : _disabledElements = json['disabledElements'],
@@ -153,8 +143,7 @@ class Config {
         _overrideLongPressMenuBehavior = json['overrideLongPressMenuBehavior'],
         _hideAnnotationMenu = json['hideAnnotationMenu'],
         _annotationMenuItems = json['annotationMenuItems'],
-        _overrideAnnotationMenuBehavior =
-            json['overrideAnnotationMenuBehavior'],
+        _overrideAnnotationMenuBehavior = json['overrideAnnotationMenuBehavior'],
         _exportPath = json['exportPath'],
         _openUrlPath = json['openUrlPath'],
         _autoSaveEnabled = json['autoSaveEnabled'],
@@ -176,8 +165,7 @@ class Config {
         _thumbnailViewEditingEnabled = json['thumbnailViewEditingEnabled'],
         _annotationAuthor = json['annotationAuthor'],
         _continuousAnnotationEditing = json['continuousAnnotationEditing'],
-        _annotationPermissionCheckEnabled =
-            json['annotationPermissionCheckEnabled'],
+        _annotationPermissionCheckEnabled = json['annotationPermissionCheckEnabled'],
         _overrideBehavior = json['overrideBehavior'],
         _tabTitle = json['tabTitle'],
         _pageNumberIndicatorAlwaysVisible = json['pageNumberIndicatorAlwaysVisible'];

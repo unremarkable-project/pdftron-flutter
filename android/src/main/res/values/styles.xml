@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TodoStyle" parent="HighlightPresetStyle1">
+        <item name="annot_color">#A6FFCB99</item>
+    </style>
+
+    <!-- 1pt turquoise -->
+    <style name="SquiggleStyle" parent="TextMarkupStyle1">
+        <item name="annot_color">#E6167E7D</item>
+        <item name="annot_thickness">1.0</item>
+    </style>
+
+    <!-- 0.8pt -->
+    <style name="UnderlineStyle" parent="TextMarkupStyle1">
+        <item name="annot_color">#A62E4B8B</item>
+        <item name="annot_thickness">0.8</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="highlight_default_style">@style/TodoStyle</item>
+        <item name="underline_default_style">@style/UnderlineStyle</item>
+        <item name="squiggly_default_style">@style/SquiggleStyle</item>
+    </style>
+</resources>

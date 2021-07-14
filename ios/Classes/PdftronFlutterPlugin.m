@@ -179,7 +179,6 @@
 
 + (void)configureTabbedDocumentViewController:(PTTabbedDocumentViewController*)tabbedDocumentViewController withConfig:(NSString*)config
 {
-
     if(config && ![config isEqualToString:@"null"])
     {
         //convert from json to dict
@@ -216,7 +215,6 @@
 
 + (void)configureDocumentController:(PTFlutterDocumentController*)documentController withConfig:(NSString*)config
 {
-
     [documentController initViewerSettings];
     
     if (config.length == 0 || [config isEqualToString:@"null"]) {
@@ -1282,7 +1280,6 @@
 
 - (void)handleOpenDocumentMethod:(NSDictionary<NSString *, id> *)arguments resultToken:(FlutterResult)flutterResult
 {
-
     // Get document argument.
     NSString *document = nil;
     id documentValue = arguments[PTDocumentArgumentKey];

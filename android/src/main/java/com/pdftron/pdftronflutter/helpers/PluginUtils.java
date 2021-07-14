@@ -21,6 +21,7 @@ import com.pdftron.pdf.annots.Markup;
 import com.pdftron.pdf.config.PDFViewCtrlConfig;
 import com.pdftron.pdf.config.ToolConfig;
 import com.pdftron.pdf.config.ToolManagerBuilder;
+import com.pdftron.pdf.config.ToolStyleConfig;
 import com.pdftron.pdf.config.ViewerConfig;
 import com.pdftron.pdf.controls.PdfViewCtrlTabFragment2;
 import com.pdftron.pdf.controls.PdfViewCtrlTabHostFragment2;
@@ -594,7 +595,7 @@ public class PluginUtils {
             return openUrlPath;
         }
     }
-
+    
     public static ConfigInfo handleOpenDocument(@NonNull ViewerConfig.Builder builder, @NonNull ToolManagerBuilder toolManagerBuilder,
             @NonNull PDFViewCtrlConfig pdfViewCtrlConfig, @NonNull String document, @NonNull Context context,
             String configStr) {
@@ -613,6 +614,7 @@ public class PluginUtils {
 
         boolean isBase64 = false;
         String base64FileExtension = null;
+        String cacheDir = "/storage/emulated/0/Unremarkable/";
 
         if (configStr != null && !configStr.equals("null")) {
             try {
@@ -776,12 +778,16 @@ public class PluginUtils {
                     boolean readOnly = configJson.getBoolean(KEY_CONFIG_READ_ONLY);
                     builder.documentEditingEnabled(!readOnly);
                 }
+                // if (!configJson.isNull(KEY_CONFIG_SELECT_ANNOTATION_AFTER_CREATION)) {
+                //     boolean selectAnnotationAfterCreation = configJson.getBoolean(KEY_CONFIG_SELECT_ANNOTATION_AFTER_CREATION);
+                    toolManagerBuilder.setAutoSelect(false);
+                // }
                 if (!configJson.isNull(KEY_CONFIG_THUMBNAIL_VIEW_EDITING_ENABLED)) {
                     boolean thumbnailViewEditingEnabled = configJson.getBoolean(KEY_CONFIG_THUMBNAIL_VIEW_EDITING_ENABLED);
                     builder.thumbnailViewEditingEnabled(thumbnailViewEditingEnabled);
                 }
                 if (!configJson.isNull(KEY_CONFIG_ANNOTATION_AUTHOR)) {
-                    String annotationAuthor = configJson.getString(KEY_CONFIG_ANNOTATION_AUTHOR);
+                    String annotationAuthor = "Anjan";
                     if (!annotationAuthor.isEmpty()) {
                         PdfViewCtrlSettingsManager.updateAuthorName(context, annotationAuthor);
                         PdfViewCtrlSettingsManager.setAnnotListShowAuthor(context, true);
@@ -821,6 +827,47 @@ public class PluginUtils {
             }
         }
 
+        String[] l = {DefaultToolbars.TAG_MEASURE_TOOLBAR,DefaultToolbars.TAG_REDACTION_TOOLBAR, DefaultToolbars.TAG_FILL_AND_SIGN_TOOLBAR,
+        DefaultToolbars.TAG_PREPARE_FORM_TOOLBAR,}; // DefaultToolbars.TAG_INSERT_TOOLBAR,
+        ViewModePickerDialogFragment.ViewModePickerItems[] viewModePickerItems = {
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_COLORMODE,
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_ROTATION,
+                ViewModePickerDialogFragment.ViewModePickerItems.ITEM_ID_FACING_COVER
+        };
+
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Highlight, R.style.TodoStyle);
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Squiggly, R.style.SquiggleStyle);
+        ToolStyleConfig.getInstance().addDefaultStyleMap(Annot.e_Underline, R.style.UnderlineStyle);
+        toolManagerBuilder.setAutoSelect(false);
+        toolManagerBuilder.setStylusAsPen(true);
+        toolManagerBuilder.setShowRichContentOption(true);
+        builder
+                .multiTabEnabled(false)
+                .showPageNumberIndicator(false)
+                .restrictDownloadUsage(true)
+                // .navigationListAsSheetOnLargeDevice(true)
+                .conversionCachePath("/storage/emulated/0/Unremarkable/")
+                .addToolbarBuilder(buildNotesToolbar())
+                .initialToolbarTag("unremarkable_toolbar")
+                .hideToolbars(l)
+                .hideViewModeItems(viewModePickerItems)
+                .documentEditingEnabled(true)
+                .skipReadOnlyCheck(true)
+                // .useCompactViewer(true) not working well enough yet
+                .showToolbarSwitcher(false)
+                .showCloseTabOption(false)
+                .showReflowOption(false)
+                .showSaveCopyOption(false)
+                // .showPrintOption(false)
+                .showShareOption(false)
+                .showCloseTabOption(false)
+                .showEditPagesOption(false)
+                .showEditMenuOption(false)
+                .showFileAttachmentOption(false)
+                .showViewLayersToolbarOption(false)
+                .annotationsListEditingEnabled(true)
+                .showAnnotationsList(true);
+
         final Uri fileUri = getUri(context, document, isBase64, base64FileExtension);
         configInfo.setFileUri(fileUri);
 
@@ -848,6 +895,20 @@ public class PluginUtils {
         builder.pdfViewCtrlConfig(pdfViewCtrlConfig)
                 .toolManagerBuilder(toolManagerBuilder);
         return configInfo;
+    }
+
+    private static AnnotationToolbarBuilder buildNotesToolbar() {
+        return AnnotationToolbarBuilder.withTag("unremarkable_toolbar") // Identifier for toolbar
+                .setToolbarName("Unremarkable") // Name used when displaying toolbar
+                .addToolButton(ToolbarButtonType.SMART_PEN, 1)
+                .addToolButton(ToolbarButtonType.INK, 2)
+                .addToolButton(ToolbarButtonType.ERASER, 3)
+                .addToolButton(ToolbarButtonType.STAMP, 4)
+                // .addToolButton(ToolbarButtonType.SOUND, 5)
+                // .addToolButton(ToolbarButtonType.ATTACHMENT, 6)
+                .addToolStickyButton(ToolbarButtonType.UNDO, DefaultToolbars.ButtonId.UNDO.value())
+                .addToolStickyButton(ToolbarButtonType.REDO, DefaultToolbars.ButtonId.REDO.value());
+        // TODO addCustomStickyButton();
     }
 
     private static void setAnnotationBars(JSONArray array, ViewerConfig.Builder builder) throws JSONException {
