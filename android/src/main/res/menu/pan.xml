@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group
+        android:id="@+id/qm_second_row_group">
+    <item android:id="@+id/qm_free_text"
+        android:title="@string/tools_qm_free_text"
+        android:icon="@drawable/ic_annotation_freetext_black_24dp" 
+            app:showAsAction="always"  />
+    <item android:id="@+id/qm_sticky_note"
+        android:title="@string/tools_qm_note"
+        android:icon="@drawable/ic_annotation_sticky_note_black_24dp"
+            app:showAsAction="always"   />
+    <item android:id="@+id/qm_ink_eraser"
+        android:title="@string/tools_qm_eraser"
+        android:icon="@drawable/ic_annotation_eraser_black_24dp" 
+            app:showAsAction="always"  />
+    <item android:id="@+id/qm_sound"
+        android:title="@string/tools_qm_sound"
+        android:icon="@drawable/ic_mic_black_24dp"
+            app:showAsAction="always"  />
+    <item android:id="@+id/qm_image_stamper"
+        android:title="@string/annot_file_attachment"
+        android:icon="@drawable/ic_annotation_image_black_24dp" 
+            app:showAsAction="always" />
+    <item android:id="@+id/qm_rectangle"
+        android:title="@string/tools_qm_rectangle"
+        android:icon="@drawable/ic_annotation_square_black_24dp" 
+            app:showAsAction="always" />
+    <item android:id="@+id/qm_rubber_stamper"
+        android:title="@string/annot_stamp"
+        android:icon="@drawable/ic_annotation_stamp_black_24dp" 
+            app:showAsAction="always" />
+            </group>
+</menu>

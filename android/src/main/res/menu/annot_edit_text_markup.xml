@@ -1,9 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/qm_free_text"
-        android:title="@string/tools_qm_free_text"
-        android:icon="@drawable/ic_annotation_freetext_black_24dp" />
-    <item android:id="@+id/qm_floating_sig"
-        android:title="@string/tools_qm_signature" 
-        android:icon="@drawable/ic_annotation_signature_black_24dp" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:visible="true">
+        <!--  -->
+        <item
+            android:id="@+id/qm_note"
+            android:icon="@drawable/ic_annotation_sticky_note_black_24dp"
+            android:title="Note"
+            app:showAsAction="always" />
+        <!-- E6 00FF00 highlight (STARRED) -->
+        <item
+            android:id="@+id/qm_highlight" 
+            android:icon="@drawable/ic_star_white_24dp"
+            android:title="Starred"
+            app:showAsAction="always" />
+        <!-- E6 E44234 thick sqiggly 1.6pt (TODO)-->
+        <item
+            android:id="@+id/qm_squiggly"
+            android:icon="@drawable/ic_fill_and_sign_checkmark"
+            android:title="Todo"
+            app:showAsAction="always" />
+        <!-- E6 373737 thick underline 2.0pt (REFERENCE)-->
+        <item
+            android:id="@+id/qm_underline"
+            android:icon="@drawable/ic_bookmarks_white_24dp"
+            android:title="Insight"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/qm_appearance"
+            android:icon="@drawable/ic_annotation_highlight_black_24dp"
+            android:title="Edit"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/qm_delete"
+            android:icon="@drawable/ic_delete_black_24dp"
+            android:title="Edit"
+            app:showAsAction="always" />
+    </group>
 </menu>

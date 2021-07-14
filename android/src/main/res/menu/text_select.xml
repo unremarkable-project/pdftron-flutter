@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/qm_first_row_group"
+        android:visible="true">
+        <item
+            android:id="@+id/qm_underline"
+            android:icon="@drawable/ic_annotation_underline_black_24dp"
+            android:title="Underline"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/qm_highlight"
+            android:icon="@drawable/ic_annotation_highlight_black_24dp"
+            android:title="Highlight"
+            app:showAsAction="always" />
+        <item
+            android:id="@+id/qm_squiggly"
+            android:icon="@drawable/ic_annotation_squiggly_black_24dp"
+            android:title="Squiggly"
+            app:showAsAction="always" />
+    </group>
+</menu>
