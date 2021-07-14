@@ -3,14 +3,18 @@
     package="com.pdftron.pdftronflutter">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application
+        android:usesCleartextTraffic="true">
 
         <!-- Document viewer activity declaration-->
         <activity
             android:name=".FlutterDocumentActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:theme="@style/PDFTronAppTheme"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan"
+            android:hardwareAccelerated="true"/>
         <activity
             android:name=".IntentDocumentActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"

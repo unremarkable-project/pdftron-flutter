@@ -135,21 +135,15 @@ class Tools {
   static const annotationCreateEllipse = 'AnnotationCreateEllipse';
   static const annotationCreatePolygon = 'AnnotationCreatePolygon';
   static const annotationCreatePolygonCloud = 'AnnotationCreatePolygonCloud';
-  static const annotationCreateDistanceMeasurement =
-      'AnnotationCreateDistanceMeasurement';
-  static const annotationCreatePerimeterMeasurement =
-      'AnnotationCreatePerimeterMeasurement';
-  static const annotationCreateAreaMeasurement =
-      'AnnotationCreateAreaMeasurement';
-  static const annotationCreateRectangleAreaMeasurement =
-      'AnnotationCreateRectangleAreaMeasurement';
+  static const annotationCreateDistanceMeasurement = 'AnnotationCreateDistanceMeasurement';
+  static const annotationCreatePerimeterMeasurement = 'AnnotationCreatePerimeterMeasurement';
+  static const annotationCreateAreaMeasurement = 'AnnotationCreateAreaMeasurement';
+  static const annotationCreateRectangleAreaMeasurement = 'AnnotationCreateRectangleAreaMeasurement';
   static const annotationCreateSound = 'AnnotationCreateSound';
-  static const annotationCreateFreeHighlighter =
-      'AnnotationCreateFreeHighlighter';
+  static const annotationCreateFreeHighlighter = 'AnnotationCreateFreeHighlighter';
   static const annotationCreateRubberStamp = 'AnnotationCreateRubberStamp';
   static const eraser = 'Eraser';
-  static const annotationCreateFileAttachment =
-      'AnnotationCreateFileAttachment';
+  static const annotationCreateFileAttachment = 'AnnotationCreateFileAttachment';
   static const annotationCreateRedaction = 'AnnotationCreateRedaction';
   static const annotationCreateLink = 'AnnotationCreateLink';
   static const annotationCreateRedactionText = 'AnnotationCreateRedactionText';
@@ -255,32 +249,4 @@ class AnnotationMenuItems {
   static const playSound = "playSound";
   static const openAttachment = "openAttachment";
   static const calibrate = "calibrate";
-}
-
-// DefaultToolbars define a set of pre-designed toolbars for easier customization
-class DefaultToolbars {
-  static const view = "PDFTron_View";
-  static const annotate = "PDFTron_Annotate";
-  static const draw = "PDFTron_Draw";
-  static const insert = "PDFTron_Insert";
-  static const fillAndSign = "PDFTron_Fill_and_Sign";
-  static const prepareForm = "PDFTron_Prepare_Form";
-  static const measure = "PDFTron_Measure";
-  static const pens = "PDFTron_Pens";
-  static const redaction = "PDFTron_Redact";
-  static const favorite = "PDFTron_Favorite";
-}
-
-// ToolbarIcons define default toolbar icons for use for potential custom toolbars
-class ToolbarIcons {
-  static const view = "PDFTron_View";
-  static const annotate = "PDFTron_Annotate";
-  static const draw = "PDFTron_Draw";
-  static const insert = "PDFTron_Insert";
-  static const fillAndSign = "PDFTron_Fill_and_Sign";
-  static const prepareForm = "PDFTron_Prepare_Form";
-  static const measure = "PDFTron_Measure";
-  static const pens = "PDFTron_Pens";
-  static const redaction = "PDFTron_Redact";
-  static const favorite = "PDFTron_Favorite";
 }

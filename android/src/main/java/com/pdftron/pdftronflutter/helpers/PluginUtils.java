@@ -704,7 +704,7 @@ public class PluginUtils {
                     String exportPath = configJson.getString(KEY_CONFIG_EXPORT_PATH);
                     configInfo.setExportPath(exportPath);
                 } else {
-                    String cacheDir = context.getCacheDir().getAbsolutePath();
+                    // String cacheDir = context.getCacheDir().getAbsolutePath();
                     configInfo.setExportPath(cacheDir);
                 }
                 if (!configJson.isNull(KEY_CONFIG_AUTO_SAVE_ENABLED)) {
@@ -819,7 +819,7 @@ public class PluginUtils {
                     String openUrlPath = configJson.getString(KEY_CONFIG_OPEN_URL_PATH);
                     configInfo.setOpenUrlPath(openUrlPath);
                 } else {
-                    String cacheDir = context.getCacheDir().getAbsolutePath();
+                    // String cacheDir = context.getCacheDir().getAbsolutePath();
                     configInfo.setOpenUrlPath(cacheDir);
                 }
             } catch (Exception ex) {

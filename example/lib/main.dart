@@ -24,22 +24,13 @@ class Viewer extends StatefulWidget {
 
 class _ViewerState extends State<Viewer> {
   String _version = 'Unknown';
-  String _document =
-      "https://pdftron.s3.amazonaws.com/downloads/pl/PDFTRON_mobile_about.pdf";
+  String _document = "/storage/emulated/0/Unremarkable/PDFTRON_mobile_about.pdf";
   bool _showViewer = true;
 
   @override
   void initState() {
     super.initState();
     initPlatformState();
-
-    if (Platform.isIOS) {
-      // Open the document for iOS, no need for permission
-      showViewer();
-    } else {
-      // Request for permissions for android before opening document
-      launchWithPermission();
-    }
   }
 
   Future<void> launchWithPermission() async {
@@ -90,16 +81,15 @@ class _ViewerState extends State<Viewer> {
     await PdftronFlutter.openDocument(_document, config: config);
 
     try {
-      PdftronFlutter.importAnnotationCommand(
-          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-              "    <xfdf xmlns=\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\">\n" +
-              "      <add>\n" +
-              "        <square style=\"solid\" width=\"5\" color=\"#E44234\" opacity=\"1\" creationdate=\"D:20200619203211Z\" flags=\"print\" date=\"D:20200619203211Z\" name=\"c684da06-12d2-4ccd-9361-0a1bf2e089e3\" page=\"1\" rect=\"113.312,277.056,235.43,350.173\" title=\"\" />\n" +
-              "      </add>\n" +
-              "      <modify />\n" +
-              "      <delete />\n" +
-              "      <pdf-info import-version=\"3\" version=\"2\" xmlns=\"http://www.pdftron.com/pdfinfo\" />\n" +
-              "    </xfdf>");
+      PdftronFlutter.importAnnotationCommand("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+          "    <xfdf xmlns=\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\">\n" +
+          "      <add>\n" +
+          "        <square style=\"solid\" width=\"5\" color=\"#E44234\" opacity=\"1\" creationdate=\"D:20200619203211Z\" flags=\"print\" date=\"D:20200619203211Z\" name=\"c684da06-12d2-4ccd-9361-0a1bf2e089e3\" page=\"1\" rect=\"113.312,277.056,235.43,350.173\" title=\"\" />\n" +
+          "      </add>\n" +
+          "      <modify />\n" +
+          "      <delete />\n" +
+          "      <pdf-info import-version=\"3\" version=\"2\" xmlns=\"http://www.pdftron.com/pdfinfo\" />\n" +
+          "    </xfdf>");
     } on PlatformException catch (e) {
       print("Failed to importAnnotationCommand '${e.message}'.");
     }
@@ -126,7 +116,6 @@ class _ViewerState extends State<Viewer> {
     // to cancel event:
     // annotCancel();
     // bookmarkCancel();
-
   }
 
   @override
@@ -137,11 +126,11 @@ class _ViewerState extends State<Viewer> {
         height: double.infinity,
         child:
             // Uncomment this to use Widget version of the viewer
-            // _showViewer
-            // ? DocumentView(
-            //     onCreated: _onDocumentViewCreated,
-            //   ):
-            Container(),
+            _showViewer
+                ? DocumentView(
+                    onCreated: _onDocumentViewCreated,
+                  )
+                : Container(),
       ),
     );
   }
@@ -153,16 +142,16 @@ class _ViewerState extends State<Viewer> {
 
     var leadingNavCancel = startLeadingNavButtonPressedListener(() {
       // Uncomment this to quit the viewer when leading navigation button is pressed
-      // this.setState(() {
-      //   _showViewer = !_showViewer;
-      // });
+      this.setState(() {
+        _showViewer = !_showViewer;
+      });
 
       // Show a dialog when leading navigation button is pressed
 
-      _showMyDialog();
+      // _showMyDialog();
     });
 
-    controller.openDocument(_document, config: config);
+    controller.openDocument(_document);
   }
 
   Future<void> _showMyDialog() async {
