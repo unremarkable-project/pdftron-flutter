@@ -80,6 +80,15 @@ class PdftronFlutter {
     });
   }
 
+  static Future<void> setPropertiesForAnnotation(
+      Annot annotation, AnnotProperty property) {
+    return _channel
+        .invokeMethod(Functions.setPropertiesForAnnotation, <String, dynamic>{
+      Parameters.annotation: jsonEncode(annotation),
+      Parameters.annotationProperties: jsonEncode(property),
+    });
+  }
+
   static Future<void> importAnnotationCommand(String xfdfCommand) {
     return _channel.invokeMethod(Functions.importAnnotationCommand,
         <String, dynamic>{Parameters.xfdfCommand: xfdfCommand});
@@ -112,6 +121,21 @@ class PdftronFlutter {
     return Rect.fromJson(jsonDecode(cropBoxString));
   }
 
+  static Future<int> getPageRotation(int pageNumber) async {
+    int pageRotation = await _channel.invokeMethod(Functions.getPageRotation,
+        <String, dynamic>{Parameters.pageNumber: pageNumber});
+    return pageRotation;
+  }
+
+  static Future<bool> setCurrentPage(int pageNumber) {
+    return _channel.invokeMethod(Functions.setCurrentPage,
+        <String, dynamic>{Parameters.pageNumber: pageNumber});
+  }
+
+  static Future<String> getDocumentPath() {
+    return _channel.invokeMethod(Functions.getDocumentPath);
+  }
+
   static Future<void> setToolMode(String toolMode) {
     return _channel.invokeMethod(Functions.setToolMode,
         <String, dynamic>{Parameters.toolMode: toolMode});
@@ -138,5 +162,9 @@ class PdftronFlutter {
 
   static Future<void> closeAllTabs() {
     return _channel.invokeMethod(Functions.closeAllTabs);
+  }
+  
+  static Future<void> deleteAllAnnotations() {
+    return _channel.invokeMethod(Functions.deleteAllAnnotations);
   }
 }

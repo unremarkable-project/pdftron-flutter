@@ -9,6 +9,11 @@ static NSString * const PTDisabledToolsKey = @"disabledTools";
 static NSString * const PTDisabledElementsKey = @"disabledElements";
 static NSString * const PTMultiTabEnabledKey = @"multiTabEnabled";
 static NSString * const PTCustomHeadersKey = @"customHeaders";
+static NSString * const PTFitModeKey = @"fitMode";
+static NSString * const PTLayoutModeKey = @"layoutMode";
+static NSString * const PTInitialPageNumberKey = @"initialPageNumber";
+static NSString * const PTIsBase64StringKey = @"isBase64String";
+static NSString * const PTBase64FileExtensionKey = @"base64FileExtension";
 static NSString * const PTHideThumbnailFilterModesKey = @"hideThumbnailFilterModes";
 static NSString * const PTLongPressMenuEnabled = @"longPressMenuEnabled";
 static NSString * const PTLongPressMenuItems = @"longPressMenuItems";
@@ -23,6 +28,7 @@ static NSString * const PTUseStylusAsPenKey = @"useStylusAsPen";
 static NSString * const PTSignSignatureFieldWithStampsKey = @"signSignatureFieldWithStamps";
 static NSString * const PTSelectAnnotationAfterCreationKey = @"selectAnnotationAfterCreation";
 static NSString * const PTPageIndicatorEnabledKey = @"pageIndicatorEnabled";
+static NSString * const PTPageNumberIndicatorAlwaysVisibleKey = @"pageNumberIndicatorAlwaysVisible";
 static NSString * const PTFollowSystemDarkModeKey = @"followSystemDarkModeKey";
 static NSString * const PTAnnotationToolbarsKey = @"annotationToolbars";
 static NSString * const PTHideDefaultAnnotationToolbarsKey = @"hideDefaultAnnotationToolbars";
@@ -35,6 +41,8 @@ static NSString * const PTReadOnlyKey = @"readOnly";
 static NSString * const PTThumbnailViewEditingEnabledKey = @"thumbnailViewEditingEnabled";
 static NSString * const PTAnnotationAuthorKey = @"annotationAuthor";
 static NSString * const PTContinuousAnnotationEditingKey = @"continuousAnnotationEditing";
+static NSString * const PTAnnotationPermissionCheckEnabledKey = @"annotationPermissionCheckEnabled";
+static NSString * const PTOverrideBehaviorKey = @"overrideBehavior";
 static NSString * const PTTabTitleKey = @"tabTitle";
 
 // tool
@@ -162,17 +170,22 @@ static NSString * const PTFlattenAnnotationsKey = @"flattenAnnotations";
 static NSString * const PTDeleteAnnotationsKey = @"deleteAnnotations";
 static NSString * const PTSelectAnnotationKey = @"selectAnnotation";
 static NSString * const PTSetFlagsForAnnotationsKey = @"setFlagsForAnnotations";
+static NSString * const PTSetPropertiesForAnnotationKey = @"setPropertiesForAnnotation";
 static NSString * const PTImportAnnotationCommandKey = @"importAnnotationCommand";
 static NSString * const PTImportBookmarksKey = @"importBookmarkJson";
 static NSString * const PTSaveDocumentKey = @"saveDocument";
 static NSString * const PTCommitToolKey = @"commitTool";
 static NSString * const PTGetPageCountKey = @"getPageCount";
 static NSString * const PTGetPageCropBoxKey = @"getPageCropBox";
+static NSString * const PTGetPageRotationKey = @"getPageRotation";
+static NSString * const PTSetCurrentPageKey = @"setCurrentPage";
+static NSString * const PTGetDocumentPathKey = @"getDocumentPath";
 static NSString * const PTSetToolModeKey = @"setToolMode";
 static NSString * const PTSetFlagForFieldsKey = @"setFlagForFields";
 static NSString * const PTSetValuesForFieldsKey = @"setValuesForFields";
 static NSString * const PTSetLeadingNavButtonIconKey = @"setLeadingNavButtonIcon";
 static NSString * const PTCloseAllTabsKey = @"closeAllTabs";
+static NSString * const PTDeleteAllAnnotationsKey = @"deleteAllAnnotations";
 
 // argument
 static NSString * const PTDocumentArgumentKey = @"document";
@@ -192,6 +205,7 @@ static NSString * const PTAnnotationListArgumentKey = @"annotations";
 static NSString * const PTFormsOnlyArgumentKey = @"formsOnly";
 static NSString * const PTAnnotationArgumentKey = @"annotation";
 static NSString * const PTAnnotationsWithFlagsArgumentKey = @"annotationsWithFlags";
+static NSString * const PTAnnotationPropertiesArgumentKey = @"annotationProperties";
 static NSString * const PTLeadingNavButtonIconArgumentKey = @"leadingNavButtonIcon";
 
 // event strings
@@ -202,11 +216,26 @@ static NSString * const PTDocumentErrorEventKey = @"document_error_event";
 static NSString * const PTAnnotationChangedEventKey = @"annotation_changed_event";
 static NSString * const PTAnnotationsSelectedEventKey = @"annotations_selected_event";
 static NSString * const PTFormFieldValueChangedEventKey = @"form_field_value_changed_event";
+static NSString * const PTBehaviorActivatedEventKey = @"behavior_activated_event";
 static NSString * const PTLongPressMenuPressedEventKey = @"long_press_menu_pressed_event";
 static NSString * const PTAnnotationMenuPressedEventKey = @"annotation_menu_pressed_event";
 static NSString * const PTLeadingNavButtonPressedEventKey = @"leading_nav_button_pressed_event";
 static NSString * const PTPageChangedEventKey = @"page_changed_event";
 static NSString * const PTZoomChangedEventKey = @"zoom_changed_event";
+
+// fit mode
+static NSString * const PTFitPageKey = @"FitPage";
+static NSString * const PTFitWidthKey = @"FitWidth";
+static NSString * const PTFitHeightKey = @"FitHeight";
+static NSString * const PTZoomKey = @"Zoom";
+
+// layout mode
+static NSString * const PTSingleKey = @"Single";
+static NSString * const PTContinuousKey = @"Continuous";
+static NSString * const PTFacingKey = @"Facing";
+static NSString * const PTFacingContinuousKey = @"FacingContinuous";
+static NSString * const PTFacingCoverKey = @"FacingCover";
+static NSString * const PTFacingCoverContinuousKey = @"FacingCoverContinuous";
 
 // other keys
 static NSString * const PTX1Key = @"x1";
@@ -237,6 +266,20 @@ static NSString * const PTFieldValueKey = @"fieldValue";
 
 static NSString * const PTAnnotPageNumberKey = @"pageNumber";
 static NSString * const PTAnnotIdKey = @"id";
+
+static NSString * const PTContentRectAnnotationPropertyKey = @"contentRect";
+static NSString * const PTContentsAnnotationPropertyKey = @"contents";
+static NSString * const PTSubjectAnnotationPropertyKey = @"subject";
+static NSString * const PTTitleAnnotationPropertyKey = @"title";
+static NSString * const PTRectAnnotationPropertyKey = @"rect";
+static NSString * const PTRotationAnnotationPropertyKey = @"rotation";
+
+static NSString * const PTLinkPressLinkAnnotationKey = @"linkPress";
+static NSString * const PTURILinkAnnotationKey = @"URI";
+static NSString * const PTURLLinkAnnotationKey = @"url";
+static NSString * const PTDataLinkAnnotationKey = @"data";
+static NSString * const PTActionLinkAnnotationKey = @"action";
+
 static NSString * const PTFlagListKey = @"flags";
 static NSString * const PTFlagKey = @"flag";
 static NSString * const PTFlagValueKey = @"flagValue";
@@ -288,6 +331,7 @@ typedef enum {
     annotationChangedId,
     annotationsSelectedId,
     formFieldValueChangedId,
+    behaviorActivatedId,
     longPressMenuPressedId,
     annotationMenuPressedId,
     leadingNavButtonPressedId,
@@ -298,6 +342,7 @@ typedef enum {
 @interface PdftronFlutterPlugin : NSObject<FlutterPlugin, FlutterStreamHandler, FlutterPlatformView>
 
 @property (nonatomic, strong) PTTabbedDocumentViewController *tabbedDocumentViewController;
+@property (nonatomic) BOOL isBase64;
 
 + (PdftronFlutterPlugin *)registerWithFrame:(CGRect)frame viewIdentifier:(int64_t)viewId messenger:(NSObject<FlutterBinaryMessenger> *)messenger;
 
@@ -308,6 +353,8 @@ typedef enum {
 -(void)documentController:(PTDocumentController*)documentController annotationsChangedWithActionString:(NSString*)actionString;
 -(void)documentController:(PTDocumentController*)documentController annotationsSelected:(NSString*)annotations;
 -(void)documentController:(PTDocumentController*)documentController formFieldValueChanged:(NSString*)fieldString;
+-(void)documentController:(PTDocumentController*)docVC behaviorActivated:(NSString*)behaviorString;
+-(void)documentController:(PTDocumentController *)docVC leadingNavButtonClicked:(nullable NSString *)nav;
 -(void)documentController:(PTDocumentController*)docVC longPressMenuPressed:(NSString*)longPressMenuPressedString;
 -(void)documentController:(PTDocumentController *)docVC annotationMenuPressed:(NSString*)annotationMenuPressedString;
 -(void)documentController:(PTDocumentController *)docVC leadingNavButtonClicked:(nullable NSString *)nav;
